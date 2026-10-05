@@ -1,0 +1,601 @@
+.owner-business-detail {
+  width: 100%;
+  max-width: 1500px;
+
+  margin: 0 auto;
+}
+
+/* ===================================================== */
+/* HEADER */
+/* ===================================================== */
+
+.owner-business-detail-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+
+  gap: 24px;
+
+  margin-bottom: 24px;
+}
+
+.owner-business-detail-back {
+  display: inline-flex;
+  align-items: center;
+
+  gap: 6px;
+
+  margin-bottom: 18px;
+  padding: 0;
+
+  border: 0;
+
+  background: transparent;
+
+  color: #667085;
+
+  font-family: inherit;
+  font-size: 12px;
+  font-weight: 700;
+
+  cursor: pointer;
+}
+
+.owner-business-detail-back:hover {
+  color: #6d5dfc;
+}
+
+.owner-business-detail-eyebrow {
+  display: block;
+
+  margin-bottom: 7px;
+
+  color: #7c6df2;
+
+  font-size: 10px;
+  font-weight: 800;
+
+  letter-spacing: 1.3px;
+}
+
+.owner-business-detail-header h1 {
+  margin: 0;
+
+  color: #182230;
+
+  font-size: 29px;
+  font-weight: 850;
+
+  letter-spacing: -0.7px;
+}
+
+.owner-business-detail-header p {
+  margin: 8px 0 0;
+
+  color: #667085;
+
+  font-size: 14px;
+}
+
+.owner-business-detail-refresh {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+
+  gap: 8px;
+
+  min-height: 42px;
+
+  padding: 0 16px;
+
+  border: 1px solid #e1e5ec;
+
+  border-radius: 10px;
+
+  background: #ffffff;
+
+  color: #344054;
+
+  font-family: inherit;
+  font-size: 13px;
+  font-weight: 750;
+
+  cursor: pointer;
+}
+
+/* ===================================================== */
+/* PROFILE */
+/* ===================================================== */
+
+.owner-business-detail-profile {
+  margin-bottom: 20px;
+
+  padding: 22px;
+
+  border: 1px solid #eaecf0;
+
+  border-radius: 15px;
+
+  background: #ffffff;
+}
+
+.owner-business-detail-profile-main {
+  display: flex;
+  align-items: center;
+
+  gap: 13px;
+
+  margin-bottom: 22px;
+}
+
+.owner-business-detail-avatar {
+  display: grid;
+
+  width: 50px;
+  height: 50px;
+
+  place-items: center;
+
+  border-radius: 13px;
+
+  background: #efedff;
+
+  color: #6d5dfc;
+}
+
+.owner-business-detail-profile-main h2 {
+  margin: 0;
+
+  color: #182230;
+
+  font-size: 18px;
+  font-weight: 850;
+}
+
+.owner-business-detail-profile-main span {
+  display: block;
+
+  margin-top: 4px;
+
+  color: #98a2b3;
+
+  font-size: 10px;
+}
+
+.owner-business-detail-profile-grid {
+  display: grid;
+
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+
+  gap: 12px;
+}
+
+.owner-business-detail-profile-grid > div,
+.owner-business-detail-subscription-grid > div {
+  padding: 13px;
+
+  border-radius: 10px;
+
+  background: #f8f9fb;
+}
+
+.owner-business-detail-profile-grid span,
+.owner-business-detail-subscription-grid span {
+  display: block;
+
+  margin-bottom: 5px;
+
+  color: #98a2b3;
+
+  font-size: 10px;
+  font-weight: 700;
+}
+
+.owner-business-detail-profile-grid strong,
+.owner-business-detail-subscription-grid strong {
+  color: #344054;
+
+  font-size: 12px;
+  font-weight: 800;
+}
+
+/* ===================================================== */
+/* STATS */
+/* ===================================================== */
+
+.owner-business-detail-stats {
+  display: grid;
+
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+
+  gap: 16px;
+
+  margin-bottom: 20px;
+}
+
+.owner-business-detail-stats article {
+  display: flex;
+  align-items: center;
+
+  gap: 12px;
+
+  padding: 17px;
+
+  border: 1px solid #eaecf0;
+
+  border-radius: 14px;
+
+  background: #ffffff;
+}
+
+.owner-business-detail-stat-icon {
+  display: grid;
+
+  width: 42px;
+  height: 42px;
+
+  place-items: center;
+
+  border-radius: 11px;
+
+  background: #efedff;
+
+  color: #6d5dfc;
+}
+
+.owner-business-detail-stat-products {
+  background: #eaf8ef;
+
+  color: #168a46;
+}
+
+.owner-business-detail-stat-tables {
+  background: #eaf3ff;
+
+  color: #2563eb;
+}
+
+.owner-business-detail-stat-orders {
+  background: #fff5e6;
+
+  color: #d97706;
+}
+
+.owner-business-detail-stats article > div:last-child {
+  display: flex;
+  flex-direction: column;
+}
+
+.owner-business-detail-stats span {
+  color: #98a2b3;
+
+  font-size: 11px;
+  font-weight: 700;
+}
+
+.owner-business-detail-stats strong {
+  margin-top: 3px;
+
+  color: #101828;
+
+  font-size: 22px;
+  font-weight: 850;
+}
+
+/* ===================================================== */
+/* SECTIONS */
+/* ===================================================== */
+
+.owner-business-detail-subscription,
+.owner-business-detail-payments {
+  margin-bottom: 20px;
+
+  padding: 22px;
+
+  border: 1px solid #eaecf0;
+
+  border-radius: 15px;
+
+  background: #ffffff;
+}
+
+.owner-business-detail-section-heading {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+
+  margin-bottom: 18px;
+
+  color: #6d5dfc;
+}
+
+.owner-business-detail-section-heading span {
+  display: block;
+
+  margin-bottom: 5px;
+
+  color: #7c6df2;
+
+  font-size: 10px;
+  font-weight: 800;
+
+  letter-spacing: 1.2px;
+}
+
+.owner-business-detail-section-heading h2 {
+  margin: 0;
+
+  color: #182230;
+
+  font-size: 17px;
+  font-weight: 850;
+}
+
+.owner-business-detail-subscription-grid {
+  display: grid;
+
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+
+  gap: 12px;
+}
+
+/* ===================================================== */
+/* STATUS */
+/* ===================================================== */
+
+.owner-business-detail-status {
+  display: inline-flex;
+
+  width: fit-content;
+
+  padding: 5px 9px;
+
+  border-radius: 999px;
+
+  font-size: 10px !important;
+
+  text-transform: capitalize;
+}
+
+.owner-business-detail-status-active {
+  background: #eaf8ef;
+
+  color: #168a46 !important;
+}
+
+.owner-business-detail-status-warning {
+  background: #fff5e6;
+
+  color: #c66a05 !important;
+}
+
+.owner-business-detail-status-inactive {
+  background: #fef0f0;
+
+  color: #d64545 !important;
+}
+
+.owner-business-detail-status-neutral {
+  background: #f2f4f7;
+
+  color: #667085 !important;
+}
+
+/* ===================================================== */
+/* PAYMENTS TABLE */
+/* ===================================================== */
+
+.owner-business-detail-table-wrapper {
+  overflow-x: auto;
+}
+
+.owner-business-detail-table {
+  width: 100%;
+
+  border-collapse: collapse;
+
+  white-space: nowrap;
+}
+
+.owner-business-detail-table th {
+  padding: 11px 14px;
+
+  border-bottom: 1px solid #eaecf0;
+
+  background: #fafbfc;
+
+  color: #667085;
+
+  font-size: 10px;
+  font-weight: 800;
+
+  text-align: left;
+  text-transform: uppercase;
+}
+
+.owner-business-detail-table td {
+  padding: 14px;
+
+  border-bottom: 1px solid #f0f1f3;
+
+  color: #475467;
+
+  font-size: 11px;
+}
+
+.owner-business-detail-table tbody tr:last-child td {
+  border-bottom: 0;
+}
+
+.owner-business-detail-payment-id {
+  display: inline-block;
+
+  max-width: 160px;
+
+  overflow: hidden;
+
+  color: #667085;
+
+  font-family: monospace;
+
+  text-overflow: ellipsis;
+}
+
+.owner-business-detail-payment-status {
+  display: inline-flex;
+
+  padding: 5px 8px;
+
+  border-radius: 999px;
+
+  font-size: 10px;
+  font-weight: 800;
+
+  text-transform: capitalize;
+}
+
+.owner-business-detail-payment-paid {
+  background: #eaf8ef;
+
+  color: #168a46;
+}
+
+.owner-business-detail-payment-pending {
+  background: #fff5e6;
+
+  color: #c66a05;
+}
+
+.owner-business-detail-payment-failed {
+  background: #fef0f0;
+
+  color: #d64545;
+}
+
+.owner-business-detail-payment-neutral {
+  background: #f2f4f7;
+
+  color: #667085;
+}
+
+.owner-business-detail-empty {
+  padding: 30px;
+
+  border-radius: 10px;
+
+  background: #fafbfc;
+
+  color: #98a2b3;
+
+  font-size: 12px;
+  text-align: center;
+}
+
+/* ===================================================== */
+/* LOADING / ERROR */
+/* ===================================================== */
+
+.owner-business-detail-state {
+  display: grid;
+
+  min-height: calc(100vh - 60px);
+
+  place-items: center;
+  align-content: center;
+
+  gap: 12px;
+
+  color: #667085;
+
+  text-align: center;
+}
+
+.owner-business-detail-state h2 {
+  margin: 3px 0 0;
+
+  color: #182230;
+}
+
+.owner-business-detail-state p {
+  margin: 0;
+}
+
+.owner-business-detail-state-actions {
+  display: flex;
+
+  gap: 10px;
+
+  margin-top: 6px;
+}
+
+.owner-business-detail-state-actions button {
+  display: inline-flex;
+  align-items: center;
+
+  gap: 7px;
+
+  min-height: 40px;
+
+  padding: 0 14px;
+
+  border: 1px solid #e1e5ec;
+
+  border-radius: 9px;
+
+  background: #ffffff;
+
+  color: #344054;
+
+  font-family: inherit;
+  font-weight: 700;
+
+  cursor: pointer;
+}
+
+.owner-business-detail-spinner {
+  color: #6d5dfc;
+
+  animation: ownerBusinessDetailSpin 0.8s linear infinite;
+}
+
+@keyframes ownerBusinessDetailSpin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* ===================================================== */
+/* RESPONSIVE */
+/* ===================================================== */
+
+@media (max-width: 1200px) {
+  .owner-business-detail-stats {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .owner-business-detail-subscription-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 800px) {
+  .owner-business-detail-profile-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 600px) {
+  .owner-business-detail-header {
+    flex-direction: column;
+  }
+
+  .owner-business-detail-refresh {
+    width: 100%;
+  }
+
+  .owner-business-detail-stats,
+  .owner-business-detail-profile-grid,
+  .owner-business-detail-subscription-grid {
+    grid-template-columns: 1fr;
+  }
+}

@@ -1,0 +1,62 @@
+name: tavora-pos
+
+services:
+  mongo:
+    image: mongo:7
+    container_name: tavora-mongo
+    restart: unless-stopped
+    volumes:
+      - mongo_data:/data/db
+    healthcheck:
+      test: ["CMD", "mongosh", "--quiet", "--eval", "db.adminCommand('ping').ok"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  backend:
+    build:
+      context: ./backend
+    image: ghcr.io/eronsalih/tavora-pos-backend:latest
+    container_name: tavora-backend
+    restart: unless-stopped
+    depends_on:
+      mongo:
+        condition: service_healthy
+    environment:
+      APP_ENV: production
+      MONGODB_URL: mongodb://mongo:27017
+      MONGODB_DB_NAME: tavora
+      JWT_SECRET_KEY: ${JWT_SECRET_KEY:?JWT_SECRET_KEY must be set in .env}
+      JWT_ALGORITHM: HS256
+      ACCESS_TOKEN_EXPIRE_MINUTES: ${ACCESS_TOKEN_EXPIRE_MINUTES:-480}
+      CORS_ORIGINS: ${CORS_ORIGINS:-}
+      PADDLE_ENVIRONMENT: ${PADDLE_ENVIRONMENT:-sandbox}
+      PADDLE_API_KEY: ${PADDLE_API_KEY:-}
+      PADDLE_WEBHOOK_SECRET: ${PADDLE_WEBHOOK_SECRET:-}
+      PADDLE_CHECKOUT_BASE_URL: ${PADDLE_CHECKOUT_BASE_URL:-}
+      PADDLE_PRICE_ID_STARTER_MONTHLY: ${PADDLE_PRICE_ID_STARTER_MONTHLY:-}
+      PADDLE_PRICE_ID_STARTER_YEARLY: ${PADDLE_PRICE_ID_STARTER_YEARLY:-}
+      PADDLE_PRICE_ID_STANDARD_MONTHLY: ${PADDLE_PRICE_ID_STANDARD_MONTHLY:-}
+      PADDLE_PRICE_ID_STANDARD_YEARLY: ${PADDLE_PRICE_ID_STANDARD_YEARLY:-}
+      PADDLE_PRICE_ID_PRO_MONTHLY: ${PADDLE_PRICE_ID_PRO_MONTHLY:-}
+      PADDLE_PRICE_ID_PRO_YEARLY: ${PADDLE_PRICE_ID_PRO_YEARLY:-}
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:8000/api/health')"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+
+  frontend:
+    build:
+      context: ./frontend
+    image: ghcr.io/eronsalih/tavora-pos-frontend:latest
+    container_name: tavora-frontend
+    restart: unless-stopped
+    depends_on:
+      backend:
+        condition: service_healthy
+    ports:
+      - "80:80"
+
+volumes:
+  mongo_data:

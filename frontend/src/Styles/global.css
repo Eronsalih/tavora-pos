@@ -1,0 +1,305 @@
+:root {
+  font-family:
+    Inter,
+    system-ui,
+    -apple-system,
+    BlinkMacSystemFont,
+    "Segoe UI",
+    sans-serif;
+  color: #18212f;
+  background: #f5f7fb;
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html {
+  min-width: 320px;
+  min-height: 100%;
+}
+
+body {
+  min-width: 320px;
+  min-height: 100vh;
+  margin: 0;
+  background: #f5f7fb;
+}
+
+button,
+input {
+  font: inherit;
+}
+
+button {
+  cursor: pointer;
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+}
+
+#root {
+  min-height: 100vh;
+}
+
+.app-layout {
+  display: grid;
+  grid-template-columns: 260px minmax(0, 1fr);
+  min-height: 100vh;
+}
+
+.app-layout__content {
+  min-width: 0;
+}
+
+.sidebar {
+  position: sticky;
+  top: 0;
+  height: 100vh;
+  padding: 28px 20px;
+  background: #101828;
+  color: #ffffff;
+}
+
+.sidebar__brand {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 0 8px 30px;
+}
+
+.sidebar__brand div {
+  display: flex;
+  flex-direction: column;
+}
+
+.sidebar__brand strong {
+  font-size: 20px;
+}
+
+.sidebar__brand span {
+  color: #98a2b3;
+  font-size: 12px;
+}
+
+.sidebar__logo {
+  display: grid;
+  width: 44px;
+  height: 44px;
+  place-items: center;
+  border-radius: 14px;
+  background: #ffffff;
+  color: #101828;
+  font-size: 20px;
+  font-weight: 800;
+}
+
+.sidebar__navigation {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.sidebar__link {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 13px 14px;
+  border-radius: 12px;
+  color: #98a2b3;
+  transition:
+    background 180ms ease,
+    color 180ms ease,
+    transform 180ms ease;
+}
+
+.sidebar__link:hover {
+  color: #ffffff;
+  background: #1d2939;
+  transform: translateX(2px);
+}
+
+.sidebar__link--active {
+  color: #101828;
+  background: #ffffff;
+}
+
+.header {
+  display: flex;
+  min-height: 84px;
+  align-items: center;
+  justify-content: space-between;
+  gap: 24px;
+  padding: 18px 32px;
+  border-bottom: 1px solid #e4e7ec;
+  background: #ffffff;
+}
+
+.header__search {
+  display: flex;
+  width: min(480px, 100%);
+  align-items: center;
+  gap: 10px;
+  padding: 0 14px;
+  border: 1px solid #d0d5dd;
+  border-radius: 12px;
+  color: #667085;
+}
+
+.header__search input {
+  width: 100%;
+  padding: 12px 0;
+  border: 0;
+  outline: none;
+  background: transparent;
+}
+
+.header__actions,
+.header__profile {
+  display: flex;
+  align-items: center;
+}
+
+.header__actions {
+  gap: 18px;
+}
+
+.header__notification {
+  display: grid;
+  width: 42px;
+  height: 42px;
+  place-items: center;
+  border: 1px solid #e4e7ec;
+  border-radius: 12px;
+  background: #ffffff;
+  color: #475467;
+}
+
+.header__profile {
+  gap: 10px;
+}
+
+.header__profile > div:last-child {
+  display: flex;
+  flex-direction: column;
+}
+
+.header__profile strong {
+  font-size: 14px;
+}
+
+.header__profile span {
+  color: #667085;
+  font-size: 12px;
+}
+
+.header__avatar {
+  display: grid;
+  width: 42px;
+  height: 42px;
+  place-items: center;
+  border-radius: 50%;
+  background: #101828;
+  color: #ffffff;
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.page-content {
+  padding: 32px;
+}
+
+.page-content h1 {
+  margin-top: 0;
+  margin-bottom: 8px;
+  font-size: 30px;
+}
+
+.page-content p {
+  margin-top: 0;
+  color: #667085;
+}
+
+@media (max-width: 900px) {
+  .app-layout {
+    grid-template-columns: 88px minmax(0, 1fr);
+  }
+
+  .sidebar {
+    padding-inline: 14px;
+  }
+
+  .sidebar__brand {
+    justify-content: center;
+    padding-inline: 0;
+  }
+
+  .sidebar__brand div,
+  .sidebar__link span {
+    display: none;
+  }
+
+  .sidebar__link {
+    justify-content: center;
+  }
+
+  .header {
+    padding-inline: 20px;
+  }
+
+  .header__profile > div:last-child {
+    display: none;
+  }
+}
+
+@media (max-width: 640px) {
+  .app-layout {
+    display: block;
+  }
+
+  .sidebar {
+    position: static;
+    width: 100%;
+    height: auto;
+  }
+
+  .sidebar__brand {
+    justify-content: flex-start;
+    padding-bottom: 18px;
+  }
+
+  .sidebar__brand div,
+  .sidebar__link span {
+    display: flex;
+  }
+
+  .sidebar__navigation {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .sidebar__link {
+    justify-content: flex-start;
+  }
+
+  .header {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .header__search {
+    width: 100%;
+  }
+
+  .header__actions {
+    justify-content: space-between;
+  }
+
+  .page-content {
+    padding: 24px 18px;
+  }
+}

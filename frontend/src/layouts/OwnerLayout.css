@@ -1,0 +1,33 @@
+.owner-layout {
+  min-height: 100vh;
+
+  background: #f5f7fb;
+}
+
+.owner-layout-content {
+  min-height: 100vh;
+
+  margin-left: 260px;
+
+  padding: 28px 30px;
+}
+
+/* ===================================================== */
+/* RESPONSIVE */
+/* ===================================================== */
+
+@media (max-width: 900px) {
+  .owner-layout-content {
+    margin-left: 220px;
+
+    padding: 24px;
+  }
+}
+
+@media (max-width: 720px) {
+  .owner-layout-content {
+    margin-left: 0;
+
+    padding: 20px 16px;
+  }
+}

@@ -1,0 +1,145 @@
+.register-page {
+  min-height: 100vh;
+  display: grid;
+  place-items: center;
+  padding: 28px 18px;
+  box-sizing: border-box;
+  background: #f4f5f9;
+}
+
+.register-card {
+  width: min(100%, 500px);
+  padding: 30px;
+  border: 1px solid #e6e8ef;
+  border-radius: 22px;
+  background: #ffffff;
+  box-shadow: 0 24px 70px rgba(35, 38, 50, 0.08);
+}
+
+.register-back {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: #676b7b;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.register-brand {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  margin-top: 24px;
+}
+
+.register-logo {
+  display: grid;
+  width: 52px;
+  height: 52px;
+  place-items: center;
+  border-radius: 15px;
+  background: #6d5dfc;
+  color: #ffffff;
+}
+
+.register-brand span {
+  color: #7a7e8e;
+  font-size: 12px;
+  font-weight: 900;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.register-brand h1 {
+  margin: 3px 0 0;
+  color: #262936;
+  font-size: 27px;
+}
+
+.register-description {
+  margin: 18px 0 22px;
+  color: #666b7b;
+  line-height: 1.55;
+}
+
+.register-error {
+  margin-bottom: 16px;
+  padding: 12px 14px;
+  border-radius: 11px;
+  background: #fff1f1;
+  color: #a43b3b;
+  font-weight: 700;
+}
+
+.register-form {
+  display: grid;
+  gap: 15px;
+}
+
+.register-form label {
+  display: grid;
+  gap: 7px;
+}
+
+.register-form label > span {
+  color: #3d4050;
+  font-size: 13px;
+  font-weight: 800;
+}
+
+.register-form input {
+  width: 100%;
+  box-sizing: border-box;
+  padding: 12px 13px;
+  border: 1px solid #dfe1e8;
+  border-radius: 11px;
+  outline: none;
+  font: inherit;
+}
+
+.register-form input:focus {
+  border-color: #6d5dfc;
+  box-shadow: 0 0 0 3px rgba(109, 93, 252, 0.12);
+}
+
+.register-form small {
+  color: #858998;
+  line-height: 1.4;
+}
+
+.register-submit {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  margin-top: 5px;
+  padding: 13px 16px;
+  border: 0;
+  border-radius: 12px;
+  background: #6d5dfc;
+  color: #ffffff;
+  font-weight: 900;
+  cursor: pointer;
+}
+
+.register-submit:disabled {
+  cursor: not-allowed;
+  opacity: 0.7;
+}
+
+.register-spinner {
+  animation: registerSpin 0.8s linear infinite;
+}
+
+@keyframes registerSpin {
+  to { transform: rotate(360deg); }
+}
+
+@media (max-width: 540px) {
+  .register-card {
+    padding: 23px 20px;
+  }
+}

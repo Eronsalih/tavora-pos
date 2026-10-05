@@ -1,0 +1,715 @@
+.owner-payments {
+  width: 100%;
+  max-width: 1500px;
+
+  margin: 0 auto;
+}
+
+/* ===================================================== */
+/* HEADER */
+/* ===================================================== */
+
+.owner-payments-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+
+  gap: 24px;
+
+  margin-bottom: 24px;
+}
+
+.owner-payments-eyebrow,
+.owner-payments-revenue-label {
+  display: block;
+
+  margin-bottom: 7px;
+
+  color: #7c6df2;
+
+  font-size: 10px;
+  font-weight: 800;
+
+  letter-spacing: 1.3px;
+}
+
+.owner-payments-header h1 {
+  margin: 0;
+
+  color: #182230;
+
+  font-size: 29px;
+  font-weight: 850;
+
+  letter-spacing: -0.7px;
+}
+
+.owner-payments-header p {
+  max-width: 620px;
+
+  margin: 8px 0 0;
+
+  color: #667085;
+
+  font-size: 14px;
+
+  line-height: 1.6;
+}
+
+.owner-payments-refresh {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+
+  gap: 8px;
+
+  min-height: 42px;
+
+  padding: 0 16px;
+
+  border: 1px solid #e1e5ec;
+
+  border-radius: 10px;
+
+  background: #ffffff;
+
+  color: #344054;
+
+  font-family: inherit;
+  font-size: 13px;
+  font-weight: 750;
+
+  cursor: pointer;
+
+  transition:
+    background 0.18s ease,
+    border-color 0.18s ease,
+    transform 0.18s ease;
+}
+
+.owner-payments-refresh:hover {
+  border-color: #c9c2ff;
+
+  background: #faf9ff;
+
+  transform: translateY(-1px);
+}
+
+/* ===================================================== */
+/* SUMMARY */
+/* ===================================================== */
+
+.owner-payments-summary {
+  display: grid;
+
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+
+  gap: 16px;
+
+  margin-bottom: 20px;
+}
+
+.owner-payments-summary article {
+  display: flex;
+  align-items: center;
+
+  gap: 13px;
+
+  padding: 17px;
+
+  border: 1px solid #eaecf0;
+
+  border-radius: 14px;
+
+  background: #ffffff;
+}
+
+.owner-payments-summary-icon {
+  display: grid;
+
+  width: 42px;
+  height: 42px;
+
+  place-items: center;
+
+  flex-shrink: 0;
+
+  border-radius: 11px;
+
+  background: #efedff;
+
+  color: #6d5dfc;
+}
+
+.owner-payments-summary-icon-paid {
+  background: #eaf8ef;
+
+  color: #168a46;
+}
+
+.owner-payments-summary-icon-pending {
+  background: #fff5e6;
+
+  color: #d97706;
+}
+
+.owner-payments-summary-icon-failed {
+  background: #fef0f0;
+
+  color: #d64545;
+}
+
+.owner-payments-summary article > div:last-child {
+  display: flex;
+  flex-direction: column;
+}
+
+.owner-payments-summary span {
+  color: #98a2b3;
+
+  font-size: 11px;
+  font-weight: 700;
+}
+
+.owner-payments-summary strong {
+  margin-top: 3px;
+
+  color: #101828;
+
+  font-size: 22px;
+  font-weight: 850;
+}
+
+/* ===================================================== */
+/* REVENUE */
+/* ===================================================== */
+
+.owner-payments-revenue {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+
+  gap: 24px;
+
+  margin-bottom: 20px;
+
+  padding: 21px;
+
+  border: 1px solid #eaecf0;
+
+  border-radius: 15px;
+
+  background: #ffffff;
+}
+
+.owner-payments-revenue h2 {
+  margin: 0;
+
+  color: #182230;
+
+  font-size: 18px;
+  font-weight: 800;
+}
+
+.owner-payments-revenue p {
+  margin: 6px 0 0;
+
+  color: #98a2b3;
+
+  font-size: 11px;
+}
+
+.owner-payments-revenue-values {
+  display: flex;
+  align-items: center;
+
+  gap: 12px;
+}
+
+.owner-payments-revenue-values > div {
+  min-width: 150px;
+
+  padding: 13px 16px;
+
+  border-radius: 11px;
+
+  background: #f8f9fb;
+}
+
+.owner-payments-revenue-values span {
+  display: block;
+
+  margin-bottom: 5px;
+
+  color: #98a2b3;
+
+  font-size: 10px;
+  font-weight: 750;
+}
+
+.owner-payments-revenue-values strong {
+  color: #101828;
+
+  font-size: 20px;
+  font-weight: 850;
+}
+
+.owner-payments-no-revenue {
+  color: #98a2b3;
+
+  font-size: 12px;
+}
+
+/* ===================================================== */
+/* TOOLBAR */
+/* ===================================================== */
+
+.owner-payments-toolbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+
+  gap: 14px;
+
+  margin-bottom: 16px;
+}
+
+.owner-payments-search {
+  display: flex;
+  align-items: center;
+
+  width: 100%;
+  max-width: 480px;
+
+  min-height: 44px;
+
+  padding: 0 13px;
+
+  border: 1px solid #e1e5ec;
+
+  border-radius: 11px;
+
+  background: #ffffff;
+
+  color: #98a2b3;
+}
+
+.owner-payments-search input {
+  width: 100%;
+
+  margin-left: 9px;
+
+  border: 0;
+  outline: 0;
+
+  background: transparent;
+
+  color: #101828;
+
+  font-family: inherit;
+  font-size: 13px;
+}
+
+.owner-payments-search input::placeholder {
+  color: #98a2b3;
+}
+
+.owner-payments-filter {
+  min-width: 180px;
+  min-height: 44px;
+
+  padding: 0 12px;
+
+  border: 1px solid #e1e5ec;
+
+  border-radius: 11px;
+
+  outline: none;
+
+  background: #ffffff;
+
+  color: #344054;
+
+  font-family: inherit;
+  font-size: 13px;
+  font-weight: 650;
+}
+
+/* ===================================================== */
+/* TABLE */
+/* ===================================================== */
+
+.owner-payments-table-card {
+  overflow: hidden;
+
+  border: 1px solid #eaecf0;
+
+  border-radius: 15px;
+
+  background: #ffffff;
+}
+
+.owner-payments-table-heading {
+  padding: 18px 20px;
+
+  border-bottom: 1px solid #eaecf0;
+}
+
+.owner-payments-table-heading > div {
+  display: flex;
+  flex-direction: column;
+}
+
+.owner-payments-table-heading strong {
+  color: #182230;
+
+  font-size: 14px;
+  font-weight: 800;
+}
+
+.owner-payments-table-heading span {
+  margin-top: 3px;
+
+  color: #98a2b3;
+
+  font-size: 11px;
+}
+
+.owner-payments-table-wrapper {
+  overflow-x: auto;
+}
+
+.owner-payments-table {
+  width: 100%;
+
+  border-collapse: collapse;
+
+  white-space: nowrap;
+}
+
+.owner-payments-table th {
+  padding: 12px 17px;
+
+  border-bottom: 1px solid #eaecf0;
+
+  background: #fafbfc;
+
+  color: #667085;
+
+  font-size: 10px;
+  font-weight: 800;
+
+  letter-spacing: 0.4px;
+
+  text-align: left;
+  text-transform: uppercase;
+}
+
+.owner-payments-table td {
+  padding: 15px 17px;
+
+  border-bottom: 1px solid #f0f1f3;
+
+  color: #475467;
+
+  font-size: 12px;
+
+  vertical-align: middle;
+}
+
+.owner-payments-table tbody tr:last-child td {
+  border-bottom: 0;
+}
+
+.owner-payments-table tbody tr {
+  transition: background 0.15s ease;
+}
+
+.owner-payments-table tbody tr:hover {
+  background: #fafaff;
+}
+
+/* ===================================================== */
+/* BUSINESS */
+/* ===================================================== */
+
+.owner-payment-business {
+  display: flex;
+  align-items: center;
+
+  gap: 10px;
+}
+
+.owner-payment-business-avatar {
+  display: grid;
+
+  width: 37px;
+  height: 37px;
+
+  place-items: center;
+
+  flex-shrink: 0;
+
+  border-radius: 10px;
+
+  background: #efedff;
+
+  color: #6d5dfc;
+
+  font-size: 13px;
+  font-weight: 850;
+}
+
+.owner-payment-business > div:last-child {
+  display: flex;
+  flex-direction: column;
+}
+
+.owner-payment-business strong {
+  color: #182230;
+
+  font-size: 12px;
+  font-weight: 800;
+}
+
+.owner-payment-business span {
+  max-width: 230px;
+
+  overflow: hidden;
+
+  margin-top: 3px;
+
+  color: #98a2b3;
+
+  font-size: 10px;
+
+  text-overflow: ellipsis;
+}
+
+/* ===================================================== */
+/* PAYMENT DATA */
+/* ===================================================== */
+
+.owner-payment-id {
+  display: inline-block;
+
+  max-width: 150px;
+
+  overflow: hidden;
+
+  color: #667085;
+
+  font-family: monospace;
+  font-size: 10px;
+
+  text-overflow: ellipsis;
+}
+
+.owner-payment-plan {
+  display: inline-flex;
+
+  padding: 5px 9px;
+
+  border-radius: 7px;
+
+  background: #f1efff;
+
+  color: #6757e6;
+
+  font-size: 10px;
+  font-weight: 800;
+
+  text-transform: capitalize;
+}
+
+.owner-payment-amount {
+  color: #101828;
+
+  font-size: 12px;
+  font-weight: 850;
+}
+
+.owner-payment-provider {
+  color: #475467;
+
+  font-size: 11px;
+  font-weight: 750;
+
+  text-transform: capitalize;
+}
+
+/* ===================================================== */
+/* STATUS */
+/* ===================================================== */
+
+.owner-payment-badge {
+  display: inline-flex;
+  align-items: center;
+
+  padding: 5px 9px;
+
+  border-radius: 999px;
+
+  font-size: 10px;
+  font-weight: 800;
+
+  text-transform: capitalize;
+}
+
+.owner-payment-badge-paid {
+  background: #eaf8ef;
+
+  color: #168a46;
+}
+
+.owner-payment-badge-pending {
+  background: #fff5e6;
+
+  color: #c66a05;
+}
+
+.owner-payment-badge-failed,
+.owner-payment-badge-cancelled {
+  background: #fef0f0;
+
+  color: #d64545;
+}
+
+.owner-payment-badge-neutral {
+  background: #f2f4f7;
+
+  color: #667085;
+}
+
+/* ===================================================== */
+/* EMPTY */
+/* ===================================================== */
+
+.owner-payments-empty {
+  display: flex;
+  align-items: center;
+  flex-direction: column;
+
+  gap: 8px;
+
+  padding: 55px 20px;
+
+  color: #98a2b3;
+
+  text-align: center;
+}
+
+.owner-payments-empty strong {
+  margin-top: 4px;
+
+  color: #344054;
+
+  font-size: 14px;
+}
+
+.owner-payments-empty span {
+  font-size: 12px;
+}
+
+/* ===================================================== */
+/* LOADING / ERROR */
+/* ===================================================== */
+
+.owner-payments-state {
+  display: grid;
+
+  min-height: calc(100vh - 60px);
+
+  place-items: center;
+  align-content: center;
+
+  gap: 12px;
+
+  color: #667085;
+
+  text-align: center;
+}
+
+.owner-payments-state h2 {
+  margin: 4px 0 0;
+
+  color: #182230;
+}
+
+.owner-payments-state p {
+  max-width: 480px;
+
+  margin: 0;
+}
+
+.owner-payments-spinner {
+  color: #6d5dfc;
+
+  animation: ownerPaymentsSpin 0.8s linear infinite;
+}
+
+@keyframes ownerPaymentsSpin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* ===================================================== */
+/* RESPONSIVE */
+/* ===================================================== */
+
+@media (max-width: 1200px) {
+  .owner-payments-summary {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 800px) {
+  .owner-payments-revenue {
+    align-items: flex-start;
+
+    flex-direction: column;
+  }
+
+  .owner-payments-revenue-values {
+    width: 100%;
+
+    flex-wrap: wrap;
+  }
+}
+
+@media (max-width: 650px) {
+  .owner-payments-header {
+    flex-direction: column;
+  }
+
+  .owner-payments-refresh {
+    width: 100%;
+  }
+
+  .owner-payments-summary {
+    grid-template-columns: 1fr;
+  }
+
+  .owner-payments-toolbar {
+    align-items: stretch;
+
+    flex-direction: column;
+  }
+
+  .owner-payments-search {
+    max-width: none;
+  }
+
+  .owner-payments-filter {
+    width: 100%;
+  }
+
+  .owner-payments-revenue-values {
+    flex-direction: column;
+  }
+
+  .owner-payments-revenue-values > div {
+    width: 100%;
+  }
+}
