@@ -5,6 +5,11 @@ on:
     branches:
       - main
 
+# Never run two deploys to production at the same time.
+concurrency:
+  group: production-deploy
+  cancel-in-progress: false
+
 jobs:
   build-and-push:
     runs-on: ubuntu-latest
@@ -37,13 +42,11 @@ jobs:
           username: ${{ github.repository_owner }}
           password: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Build services with Docker Compose
-        run: |
-          docker compose -f docker-compose.prod.yml build
-
-      - name: Push services to GHCR
-        run: |
-          docker compose -f docker-compose.prod.yml push
+      # One step: builds both services and pushes both tags (SHA + latest)
+      - name: Build and push images
+        env:
+          IMAGE_TAG: ${{ github.sha }}
+        run: docker compose -f docker-compose.prod.yml build --push
 
   deploy:
     needs: build-and-push
@@ -90,10 +93,22 @@ jobs:
 
             # .env is written from GitHub secrets on every deploy,
             # so a brand-new VM needs no manual setup.
+            # Paddle secrets that don't exist yet are simply empty.
             umask 077
             cat > .env <<ENVFILE
+            IMAGE_TAG=${{ github.sha }}
             JWT_SECRET_KEY=${{ secrets.JWT_SECRET_KEY }}
             CORS_ORIGINS=${{ secrets.CORS_ORIGINS }}
+            PADDLE_ENVIRONMENT=${{ secrets.PADDLE_ENVIRONMENT }}
+            PADDLE_API_KEY=${{ secrets.PADDLE_API_KEY }}
+            PADDLE_WEBHOOK_SECRET=${{ secrets.PADDLE_WEBHOOK_SECRET }}
+            PADDLE_CHECKOUT_BASE_URL=${{ secrets.PADDLE_CHECKOUT_BASE_URL }}
+            PADDLE_PRICE_ID_STARTER_MONTHLY=${{ secrets.PADDLE_PRICE_ID_STARTER_MONTHLY }}
+            PADDLE_PRICE_ID_STARTER_YEARLY=${{ secrets.PADDLE_PRICE_ID_STARTER_YEARLY }}
+            PADDLE_PRICE_ID_STANDARD_MONTHLY=${{ secrets.PADDLE_PRICE_ID_STANDARD_MONTHLY }}
+            PADDLE_PRICE_ID_STANDARD_YEARLY=${{ secrets.PADDLE_PRICE_ID_STANDARD_YEARLY }}
+            PADDLE_PRICE_ID_PRO_MONTHLY=${{ secrets.PADDLE_PRICE_ID_PRO_MONTHLY }}
+            PADDLE_PRICE_ID_PRO_YEARLY=${{ secrets.PADDLE_PRICE_ID_PRO_YEARLY }}
             ENVFILE
 
             echo "${{ secrets.GITHUB_TOKEN }}" | docker login ghcr.io \
@@ -104,7 +119,8 @@ jobs:
 
             docker compose -f docker-compose.prod.yml up -d --remove-orphans
 
-            docker image prune -f
+            # Remove unused images older than 7 days (keeps recent ones for rollback)
+            docker image prune -af --filter "until=168h"
 
             docker compose -f docker-compose.prod.yml ps
 

@@ -16,7 +16,11 @@ services:
   backend:
     build:
       context: ./backend
-    image: ghcr.io/eronsalih/tavora-pos-backend:latest
+      # Extra tag: every build is also tagged "latest"
+      tags:
+        - ghcr.io/eronsalih/tavora-pos-backend:latest
+    # IMAGE_TAG = commit SHA (set by CI/CD). Falls back to "latest".
+    image: ghcr.io/eronsalih/tavora-pos-backend:${IMAGE_TAG:-latest}
     container_name: tavora-backend
     restart: unless-stopped
     depends_on:
@@ -49,7 +53,9 @@ services:
   frontend:
     build:
       context: ./frontend
-    image: ghcr.io/eronsalih/tavora-pos-frontend:latest
+      tags:
+        - ghcr.io/eronsalih/tavora-pos-frontend:latest
+    image: ghcr.io/eronsalih/tavora-pos-frontend:${IMAGE_TAG:-latest}
     container_name: tavora-frontend
     restart: unless-stopped
     depends_on:
