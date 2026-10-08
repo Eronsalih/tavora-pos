@@ -46,6 +46,10 @@ jobs:
       - name: Build and push images
         env:
           IMAGE_TAG: ${{ github.sha }}
+          # Compose checks ALL variables when it reads the file, even for build.
+          # This value is only for reading the file: it is NOT baked into the image.
+          # The real secret is written to .env on the VM in the deploy job.
+          JWT_SECRET_KEY: build-only-placeholder
         run: docker compose -f docker-compose.prod.yml build --push
 
   deploy:
