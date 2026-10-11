@@ -1,10 +1,10 @@
-import "./tables.css";
+import "./Tables.css";
 import { useEffect, useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
 
 import { Armchair, Users } from "lucide-react";
 
-import OrderPanel from "../../Components/ui/OrderPanel";
+import OrderPanel from "../../components/ui/OrderPanel";
 
 import { getTables, updateTableStatus } from "../../services/tableService";
 

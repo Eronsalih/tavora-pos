@@ -1,6 +1,6 @@
 import { Outlet } from "react-router-dom";
 
-import OwnerSidebar from "../Components/owner/OwnerSidebar";
+import OwnerSidebar from "../components/owner/OwnerSidebar";
 
 import "./OwnerLayout.css";
 

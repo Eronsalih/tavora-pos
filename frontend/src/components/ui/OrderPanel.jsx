@@ -7,7 +7,6 @@ import { hasMinimumPlan } from "../../utils/subscriptionPlans";
 import {
   Armchair,
   Banknote,
-  ChevronRight,
   CreditCard,
   MapPin,
   Minus,
@@ -599,55 +598,6 @@ function OrderPanel({ table, onClose, onOrderSaved }) {
       setError(err.message || "Produktet shtesë nuk mund të dërgohen.");
     } finally {
       setSavingOrder(false);
-    }
-  }
-
-  async function handleSendToKitchen() {
-    if (!currentOrderId) {
-      setError(t("orderPanel.saveBeforeSending"));
-      return;
-    }
-
-    if (currentOrderStatus !== "draft") {
-      setError(t("orderPanel.onlyDraftSendable"));
-      return;
-    }
-
-    try {
-      setSendingToKitchen(true);
-      resetMessages();
-
-      // Save the latest items first, so "Send" also works without
-      // pressing a separate "Save draft" button.
-      if (orderItems.length > 0) {
-        await updateOrder(currentOrderId, {
-          items: createItemsPayload(),
-        });
-      }
-
-      const updatedOrder = await updateOrderStatus(
-        currentOrderId,
-        "sent_to_kitchen",
-      );
-
-      setCurrentOrderStatus(updatedOrder.status);
-
-      /*
-       * Send Order e zbret stock-un në backend.
-       * Prandaj e rifreskojmë listën e produkteve
-       * që frontend-i ta shfaqë stock-un e ri.
-       */
-      await reloadProducts();
-
-      await refreshTables(updatedOrder);
-
-      setSuccessMessage(t("orderPanel.orderSent"));
-    } catch (err) {
-      console.error("Gabim gjatë dërgimit të porosisë:", err);
-
-      setError(err.message || "Porosia nuk mund të dërgohet.");
-    } finally {
-      setSendingToKitchen(false);
     }
   }
 

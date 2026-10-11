@@ -4,26 +4,26 @@ import {
   Routes,
 } from "react-router-dom";
 
-import AuthenticatedRoute from "../Components/auth/AuthenticatedRoute";
-import PlanRoute from "../Components/auth/PlanRoute";
-import ProtectedRoute from "../Components/auth/ProtectedRoute";
-import PublicRoute from "../Components/auth/PublicRoute";
-import RoleRoute from "../Components/auth/RoleRoute";
+import AuthenticatedRoute from "../components/auth/AuthenticatedRoute";
+import PlanRoute from "../components/auth/PlanRoute";
+import ProtectedRoute from "../components/auth/ProtectedRoute";
+import PublicRoute from "../components/auth/PublicRoute";
+import RoleRoute from "../components/auth/RoleRoute";
 
 import MainLayout from "../layouts/MainLayout";
 
-import Bar from "../Pages/Bar/Bar";
-import Dashboard from "../Pages/Dashboard/Dashboard";
-import Kitchen from "../Pages/Kitchen/Kitchen";
-import Login from "../Pages/Login/Login";
-import Orders from "../Pages/Orders/Orders";
-import PaymentPlan from "../Pages/PaymentPlan/PaymentPlan";
-import PlatformAdmin from "../Pages/PlatformAdmin/PlatformAdmin";
-import Products from "../Pages/Products/Products";
-import Register from "../Pages/Register/Register";
-import Reports from "../Pages/Reports/Reports";
-import Settings from "../Pages/Settings/Settings";
-import Tables from "../Pages/Tables/Tables";
+import Bar from "../pages/Bar/Bar";
+import Dashboard from "../pages/Dashboard/Dashboard";
+import Kitchen from "../pages/Kitchen/Kitchen";
+import Login from "../pages/Login/Login";
+import Orders from "../pages/Orders/Orders";
+import PaymentPlan from "../pages/PaymentPlan/PaymentPlan";
+import PlatformAdmin from "../pages/PlatformAdmin/PlatformAdmin";
+import Products from "../pages/Products/Products";
+import Register from "../pages/Register/Register";
+import Reports from "../pages/Reports/Reports";
+import Settings from "../pages/Settings/Settings";
+import Tables from "../pages/Tables/Tables";
 
 
 export default function AppRoutes() {

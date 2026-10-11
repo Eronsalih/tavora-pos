@@ -12,7 +12,7 @@ async function request(call, fallback) {
     const response = await call();
     return response.data;
   } catch (error) {
-    throw new Error(detail(error, fallback));
+    throw new Error(detail(error, fallback), { cause: error });
   }
 }
 

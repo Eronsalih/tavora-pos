@@ -26,6 +26,7 @@ export async function getDailyReport({ reportDate, waiterId } = {}) {
   } catch (error) {
     throw new Error(
       getErrorMessage(error, "Daily report nuk mund të ngarkohet."),
+      { cause: error },
     );
   }
 }
@@ -38,6 +39,7 @@ export async function getReportWaiters() {
   } catch (error) {
     throw new Error(
       getErrorMessage(error, "Kamarierët nuk mund të ngarkohen."),
+      { cause: error },
     );
   }
 }
@@ -94,6 +96,7 @@ export async function createXReport({ reportDate, waiterId } = {}) {
   } catch (error) {
     throw new Error(
       getErrorMessage(error, "Raporti X nuk mund të krijohet."),
+      { cause: error },
     );
   }
 }
