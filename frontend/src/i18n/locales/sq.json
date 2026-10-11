@@ -444,7 +444,12 @@
     "lastPayment": "Pagesa e fundit",
     "on": "ON",
     "off": "OFF",
+    "activate": "Aktivizo",
     "activate30": "Aktivizo 30 ditë",
+    "duration": "Kohëzgjatja",
+    "duration1Month": "1 muaj",
+    "duration3Months": "3 muaj",
+    "duration1Year": "1 vit",
     "pause": "Ndalo abonimin",
     "payments": "Pagesat",
     "paymentsDescription": "Pagesat më të fundit të abonimeve.",
@@ -454,7 +459,7 @@
     "noAudit": "Nuk ka audit entries ende.",
     "enabledSuccess": "Biznesi u aktivizua.",
     "disabledSuccess": "Biznesi u çaktivizua.",
-    "activatedSuccess": "Abonimi u aktivizua për 30 ditë.",
+    "activatedSuccess": "Abonimi u aktivizua për {{duration}}.",
     "pausedSuccess": "Abonimi u ndal."
   },
   "bar": {

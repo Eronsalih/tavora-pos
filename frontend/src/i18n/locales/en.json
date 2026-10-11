@@ -652,7 +652,12 @@
     "lastPayment": "Last payment",
     "on": "ON",
     "off": "OFF",
+    "activate": "Activate",
     "activate30": "Activate 30 days",
+    "duration": "Duration",
+    "duration1Month": "1 month",
+    "duration3Months": "3 months",
+    "duration1Year": "1 year",
     "pause": "Pause subscription",
     "payments": "Payments",
     "paymentsDescription": "Latest subscription payments.",
@@ -662,7 +667,7 @@
     "noAudit": "No audit entries yet.",
     "enabledSuccess": "Business enabled.",
     "disabledSuccess": "Business disabled.",
-    "activatedSuccess": "Subscription activated for 30 days.",
+    "activatedSuccess": "Subscription activated for {{duration}}.",
     "pausedSuccess": "Subscription paused."
   }
 }

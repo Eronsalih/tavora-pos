@@ -29,6 +29,12 @@ import "./PlatformAdmin.css";
 
 const PLAN_OPTIONS = ["starter", "standard", "pro"];
 
+const DURATION_OPTIONS = [
+  { days: 30, labelKey: "platformAdmin.duration1Month" },
+  { days: 90, labelKey: "platformAdmin.duration3Months" },
+  { days: 365, labelKey: "platformAdmin.duration1Year" },
+];
+
 function formatDate(value, language = "en-GB") {
   if (!value) return "-";
   const date = new Date(value);
@@ -63,6 +69,7 @@ export default function PlatformAdmin() {
   const [error, setError] = useState("");
   const [message, setMessage] = useState("");
   const [manualPlans, setManualPlans] = useState({});
+  const [manualDurations, setManualDurations] = useState({});
 
   useEffect(() => {
     if (user && user.role !== "superadmin") {
@@ -132,13 +139,22 @@ export default function PlatformAdmin() {
         : "starter");
   }
 
-  async function runBusinessAction(businessId, action, successKey) {
+  function selectedDurationFor(business) {
+    return manualDurations[business.id] || DURATION_OPTIONS[0].days;
+  }
+
+  function durationLabel(days) {
+    const option = DURATION_OPTIONS.find((item) => item.days === days);
+    return option ? t(option.labelKey) : `${days}`;
+  }
+
+  async function runBusinessAction(businessId, action, successMessage) {
     try {
       setWorkingBusinessId(businessId);
       setError("");
       setMessage("");
       await action();
-      setMessage(t(successKey));
+      setMessage(successMessage);
       await loadData({ silent: true });
     } catch (requestError) {
       setError(
@@ -249,7 +265,7 @@ export default function PlatformAdmin() {
                         onClick={() => runBusinessAction(
                           business.id,
                           () => setPlatformBusinessEnabled(business.id, !business.is_active),
-                          business.is_active ? "platformAdmin.disabledSuccess" : "platformAdmin.enabledSuccess",
+                          business.is_active ? t("platformAdmin.disabledSuccess") : t("platformAdmin.enabledSuccess"),
                         )}
                       >
                         {business.is_active ? t("platformAdmin.on") : t("platformAdmin.off")}
@@ -264,6 +280,14 @@ export default function PlatformAdmin() {
                         >
                           {PLAN_OPTIONS.map((plan) => <option key={plan} value={plan}>{plan}</option>)}
                         </select>
+                        <select
+                          value={selectedDurationFor(business)}
+                          disabled={working}
+                          aria-label={t("platformAdmin.duration")}
+                          onChange={(event) => setManualDurations((current) => ({ ...current, [business.id]: Number(event.target.value) }))}
+                        >
+                          {DURATION_OPTIONS.map((option) => <option key={option.days} value={option.days}>{t(option.labelKey)}</option>)}
+                        </select>
                         <button
                           type="button"
                           disabled={working}
@@ -271,14 +295,16 @@ export default function PlatformAdmin() {
                             business.id,
                             () => activatePlatformBusiness(business.id, {
                               plan: selectedPlanFor(business),
-                              duration_days: 30,
+                              duration_days: selectedDurationFor(business),
                               note: "Activated from Tavora Platform Admin",
                             }),
-                            "platformAdmin.activatedSuccess",
+                            t("platformAdmin.activatedSuccess", {
+                              duration: durationLabel(selectedDurationFor(business)),
+                            }),
                           )}
                         >
                           {working ? <LoaderCircle size={15} className="platform-admin-spinner" /> : null}
-                          {t("platformAdmin.activate30")}
+                          {t("platformAdmin.activate")}
                         </button>
                         {business.subscription_status === "active" && (
                           <button
@@ -288,7 +314,7 @@ export default function PlatformAdmin() {
                             onClick={() => runBusinessAction(
                               business.id,
                               () => setPlatformSubscriptionStatus(business.id, "inactive"),
-                              "platformAdmin.pausedSuccess",
+                              t("platformAdmin.pausedSuccess"),
                             )}
                           >
                             {t("platformAdmin.pause")}

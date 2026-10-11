@@ -444,7 +444,12 @@
     "lastPayment": "Letzte Zahlung",
     "on": "AN",
     "off": "AUS",
+    "activate": "Aktivieren",
     "activate30": "30 Tage aktivieren",
+    "duration": "Laufzeit",
+    "duration1Month": "1 Monat",
+    "duration3Months": "3 Monate",
+    "duration1Year": "1 Jahr",
     "pause": "Abonnement pausieren",
     "payments": "Zahlungen",
     "paymentsDescription": "Neueste Abonnementzahlungen.",
@@ -454,7 +459,7 @@
     "noAudit": "Noch keine Audit-Einträge.",
     "enabledSuccess": "Betrieb aktiviert.",
     "disabledSuccess": "Betrieb deaktiviert.",
-    "activatedSuccess": "Abonnement für 30 Tage aktiviert.",
+    "activatedSuccess": "Abonnement für {{duration}} aktiviert.",
     "pausedSuccess": "Abonnement pausiert."
   },
   "bar": {
