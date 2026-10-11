@@ -5,9 +5,12 @@ import { useAuth } from "../../context/AuthContext";
 import { hasMinimumPlan } from "../../utils/subscriptionPlans";
 
 import {
+  ArrowLeftRight,
   Armchair,
   Banknote,
   CreditCard,
+  Gift,
+  LoaderCircle,
   MapPin,
   Minus,
   Plus,
@@ -22,6 +25,7 @@ import {
 import { PRODUCT_CATEGORIES } from "../../constants/productCategories";
 
 import { getProducts } from "../../services/productService";
+import { getTables } from "../../services/tableService";
 
 import {
   addItemsToOrder,
@@ -30,6 +34,7 @@ import {
   getOrderById,
   payOrder,
   releaseOrderComplimentary,
+  transferOrderTable,
   updateOrder,
   updateOrderStatus,
 } from "../../services/orderService";
@@ -70,6 +75,11 @@ function OrderPanel({ table, onClose, onOrderSaved }) {
   const [complimentaryPin, setComplimentaryPin] = useState("");
   const [complimentaryReason, setComplimentaryReason] = useState("");
   const [releasingComplimentary, setReleasingComplimentary] = useState(false);
+
+  const [transferOpen, setTransferOpen] = useState(false);
+  const [freeTables, setFreeTables] = useState([]);
+  const [loadingFreeTables, setLoadingFreeTables] = useState(false);
+  const [transferringToId, setTransferringToId] = useState(null);
 
   const [error, setError] = useState("");
   const [successMessage, setSuccessMessage] = useState("");
@@ -207,7 +217,14 @@ function OrderPanel({ table, onClose, onOrderSaved }) {
     payingOrder ||
     cancellingOrder ||
     sendingToKitchen ||
-    releasingComplimentary;
+    releasingComplimentary ||
+    Boolean(transferringToId);
+
+  const canTransferTable =
+    Boolean(currentOrderId) &&
+    ["draft", "sent_to_kitchen", "preparing", "ready"].includes(
+      currentOrderStatus,
+    );
 
   const orderIsEditable = !currentOrderId || currentOrderStatus === "draft";
 
@@ -222,6 +239,70 @@ function OrderPanel({ table, onClose, onOrderSaved }) {
   function resetMessages() {
     setError("");
     setSuccessMessage("");
+  }
+
+  async function openTransferModal() {
+    resetMessages();
+    setTransferOpen(true);
+    setFreeTables([]);
+
+    try {
+      setLoadingFreeTables(true);
+
+      const tablesData = await getTables();
+      const tablesList = Array.isArray(tablesData)
+        ? tablesData
+        : tablesData?.tables || [];
+
+      setFreeTables(
+        tablesList
+          .filter(
+            (item) =>
+              item.id !== table.id &&
+              item.status === "free" &&
+              !item.active_order_id &&
+              item.is_active !== false,
+          )
+          .sort((a, b) => Number(a.number) - Number(b.number)),
+      );
+    } catch (err) {
+      console.error("Free tables could not be loaded:", err);
+      setError(err.message || t("orderPanel.transfer.loadError"));
+      setTransferOpen(false);
+    } finally {
+      setLoadingFreeTables(false);
+    }
+  }
+
+  async function handleTransferTable(targetTable) {
+    if (!currentOrderId || transferringToId) {
+      return;
+    }
+
+    try {
+      setTransferringToId(targetTable.id);
+      resetMessages();
+
+      const transferredOrder = await transferOrderTable(
+        currentOrderId,
+        targetTable.id,
+      );
+
+      setTransferOpen(false);
+      setSuccessMessage(
+        t("orderPanel.transfer.success", { number: targetTable.number }),
+      );
+
+      // The tables page reloads and reopens this panel on the new table.
+      if (onOrderSaved) {
+        await onOrderSaved(transferredOrder);
+      }
+    } catch (err) {
+      console.error("Order transfer error:", err);
+      setError(err.message || t("orderPanel.transfer.error"));
+    } finally {
+      setTransferringToId(null);
+    }
   }
 
   async function reloadProducts() {
@@ -859,21 +940,45 @@ function OrderPanel({ table, onClose, onOrderSaved }) {
           </div>
 
           <div className="order-panel-header-actions">
-            {currentOrderId && canUseComplimentary && (
-              <button
-                type="button"
-                className="complimentary-header-button"
-                disabled={actionInProgress}
-                onClick={() => {
-                  resetMessages();
-                  setComplimentaryPin("");
-                  setComplimentaryReason("");
-                  setComplimentaryOpen(true);
-                }}
-              >
-                {t("complimentary.releaseButton")}
-              </button>
-            )}
+            <button
+              type="button"
+              className="order-header-button"
+              disabled={!canTransferTable || actionInProgress}
+              title={
+                canTransferTable ? undefined : t("orderPanel.saveOrderFirst")
+              }
+              onClick={openTransferModal}
+            >
+              <ArrowLeftRight size={16} />
+              {t("orderPanel.transfer.button")}
+            </button>
+
+            <button
+              type="button"
+              className="order-header-button order-header-button-gift"
+              disabled={
+                !currentOrderId || !canUseComplimentary || actionInProgress
+              }
+              title={
+                !canUseComplimentary
+                  ? t("complimentary.proOnly")
+                  : !currentOrderId
+                    ? t("orderPanel.saveOrderFirst")
+                    : undefined
+              }
+              onClick={() => {
+                resetMessages();
+                setComplimentaryPin("");
+                setComplimentaryReason("");
+                setComplimentaryOpen(true);
+              }}
+            >
+              <Gift size={16} />
+              {t("complimentary.releaseButton")}
+              {!canUseComplimentary && (
+                <span className="order-header-badge">PRO</span>
+              )}
+            </button>
 
             <button
               type="button"
@@ -1332,6 +1437,70 @@ function OrderPanel({ table, onClose, onOrderSaved }) {
               : t("orderPanel.cancelOrder")}
           </button>
         </footer>
+
+        {transferOpen && (
+          <div
+            className="complimentary-modal-overlay"
+            onClick={transferringToId ? undefined : () => setTransferOpen(false)}
+          >
+            <div
+              className="complimentary-modal transfer-modal"
+              onClick={(event) => event.stopPropagation()}
+            >
+              <div className="complimentary-modal-header">
+                <div>
+                  <span>
+                    {t("orderPanel.transfer.eyebrow", { number: table.number })}
+                  </span>
+                  <h3>{t("orderPanel.transfer.title")}</h3>
+                </div>
+
+                <button
+                  type="button"
+                  className="complimentary-modal-close"
+                  disabled={Boolean(transferringToId)}
+                  onClick={() => setTransferOpen(false)}
+                >
+                  <X size={20} />
+                </button>
+              </div>
+
+              <p className="complimentary-modal-description">
+                {t("orderPanel.transfer.description")}
+              </p>
+
+              {loadingFreeTables ? (
+                <p className="transfer-empty">
+                  <LoaderCircle size={18} className="transfer-spinner" />
+                  {t("orderPanel.transfer.loading")}
+                </p>
+              ) : freeTables.length === 0 ? (
+                <p className="transfer-empty">
+                  {t("orderPanel.transfer.noFreeTables")}
+                </p>
+              ) : (
+                <div className="transfer-table-grid">
+                  {freeTables.map((freeTable) => (
+                    <button
+                      key={freeTable.id}
+                      type="button"
+                      className="transfer-table-option"
+                      disabled={Boolean(transferringToId)}
+                      onClick={() => handleTransferTable(freeTable)}
+                    >
+                      {transferringToId === freeTable.id ? (
+                        <LoaderCircle size={18} className="transfer-spinner" />
+                      ) : (
+                        <strong>{freeTable.number}</strong>
+                      )}
+                      <small>{freeTable.zone}</small>
+                    </button>
+                  ))}
+                </div>
+              )}
+            </div>
+          </div>
+        )}
 
         {canUseComplimentary && complimentaryOpen && (
           <div

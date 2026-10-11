@@ -46,6 +46,30 @@ def normalize_business_id(
     return ObjectId(str(business_id))
 
 
+async def pin_is_taken(
+    pin: str,
+    business_id: ObjectId,
+    exclude_user_id: ObjectId | None = None,
+) -> bool:
+    """PIN login finds the employee by PIN alone, so two employees of the
+    same business must never share a PIN (otherwise one logs in as the
+    other). PINs are hashed, so we have to check them one by one."""
+    query: dict[str, Any] = {
+        "business_id": business_id,
+        "hashed_pin": {"$exists": True},
+    }
+
+    if exclude_user_id is not None:
+        query["_id"] = {"$ne": exclude_user_id}
+
+    async for user in users_collection.find(query):
+        hashed_pin = user.get("hashed_pin")
+        if hashed_pin and verify_password(pin, hashed_pin):
+            return True
+
+    return False
+
+
 async def create_users_indexes() -> None:
     await users_collection.create_index(
         "email",
@@ -150,6 +174,14 @@ async def create_user(
         )
 
     if user_data.pin:
+        if normalized_business_id is not None and await pin_is_taken(
+            user_data.pin,
+            normalized_business_id,
+        ):
+            raise ValueError(
+                "This PIN is already used by another employee.",
+            )
+
         user_document["hashed_pin"] = hash_password(
             user_data.pin,
         )
@@ -311,6 +343,15 @@ async def set_user_pin(
 
     if business_object_id is None:
         return None
+
+    if await pin_is_taken(
+        pin,
+        business_object_id,
+        exclude_user_id=ObjectId(user_id),
+    ):
+        raise ValueError(
+            "This PIN is already used by another employee.",
+        )
 
     now = datetime.now(timezone.utc)
 

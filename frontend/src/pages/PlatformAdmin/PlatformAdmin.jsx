@@ -349,7 +349,7 @@ export default function PlatformAdmin() {
           <div className="platform-admin-list">
             {audit.slice(0, 20).map((entry) => (
               <div key={entry.id}>
-                <div><strong>{entry.type}</strong><small>{entry.performed_by_name || entry.authorized_by_name || "Tavora"}</small></div>
+                <div><strong>{entry.type}</strong><small>{[entry.business_name, entry.performed_by_name || entry.authorized_by_name || "Tavora"].filter(Boolean).join(" · ")}</small></div>
                 <div className="platform-admin-list-right"><small>{formatDate(entry.created_at, i18n.language)}</small></div>
               </div>
             ))}

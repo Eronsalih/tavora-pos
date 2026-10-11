@@ -181,6 +181,18 @@
     "VIP": "VIP"
   },
   "orderPanel": {
+    "saveOrderFirst": "Save the order first.",
+    "transfer": {
+      "button": "Change table",
+      "eyebrow": "Table {{number}}",
+      "title": "Choose the new table",
+      "description": "The order moves with all its items to the selected table. The current table becomes free.",
+      "loading": "Loading free tables...",
+      "noFreeTables": "There are no free tables right now.",
+      "success": "Order moved to table {{number}}.",
+      "error": "The order could not be moved.",
+      "loadError": "Tables could not be loaded."
+    },
     "outOfStock": "{{product}} is out of stock.",
     "onlyLeft": "Only {{count}} left",
     "stockLabel": "Stock: {{count}}",
@@ -537,6 +549,7 @@
     "logout": "Log out"
   },
   "complimentary": {
+    "proOnly": "This feature is available on the Pro plan.",
     "releaseButton": "Release from payment",
     "eyebrow": "Administrator authorization",
     "title": "Release order from payment",

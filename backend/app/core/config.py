@@ -9,6 +9,11 @@ class Settings(BaseSettings):
     # App
     app_env: str = "development"
 
+    # Test helpers that must never be reachable on a real café:
+    # "simulate payment success" and "delete all orders". Off by default;
+    # set ALLOW_DEMO_TOOLS=true only on your own dev machine.
+    allow_demo_tools: bool = False
+
     # Paddle
     paddle_environment: str = "sandbox"
     paddle_api_key: str | None = None
@@ -34,3 +39,10 @@ class Settings(BaseSettings):
 
 
 settings = Settings()
+
+
+def demo_tools_enabled() -> bool:
+    return (
+        settings.allow_demo_tools
+        and settings.app_env.lower() != "production"
+    )

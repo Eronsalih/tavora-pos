@@ -1,12 +1,13 @@
 from datetime import datetime, timezone
 from typing import Annotated
 
-from fastapi import APIRouter, Depends, HTTPException, status
+from fastapi import APIRouter, Depends, HTTPException, Request, status
 from fastapi.security import (
     HTTPAuthorizationCredentials,
     HTTPBearer,
 )
 
+from app.core.rate_limit import client_ip, login_limiter
 from app.core.security import (
     create_access_token,
     decode_access_token,
@@ -179,13 +180,21 @@ async def require_active_subscription(
 )
 async def login(
     credentials: UserLogin,
+    request: Request,
 ) -> TokenResponse:
+    limiter_key = (
+        f"login:{client_ip(request)}:"
+        f"{str(credentials.email).strip().lower()}"
+    )
+    login_limiter.check(limiter_key)
+
     user = await authenticate_user(
         email=str(credentials.email),
         password=credentials.password,
     )
 
     if user is None:
+        login_limiter.record_failure(limiter_key)
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
             detail="Email or password is incorrect.",
@@ -193,6 +202,8 @@ async def login(
                 "WWW-Authenticate": "Bearer",
             },
         )
+
+    login_limiter.reset(limiter_key)
 
     # First login of an older business: create default tables and menu.
     await safe_ensure_business_setup(user.get("business_id"))
@@ -218,13 +229,18 @@ async def login(
 )
 async def pin_login(
     credentials: UserPinLogin,
+    request: Request,
 ) -> TokenResponse:
+    limiter_key = f"pin:{client_ip(request)}:{credentials.business_id}"
+    login_limiter.check(limiter_key)
+
     user = await authenticate_user_by_pin(
         pin=credentials.pin,
         business_id=credentials.business_id,
     )
 
     if user is None:
+        login_limiter.record_failure(limiter_key)
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
             detail="Employee PIN is incorrect.",
@@ -232,6 +248,8 @@ async def pin_login(
                 "WWW-Authenticate": "Bearer",
             },
         )
+
+    login_limiter.reset(limiter_key)
 
     # First login of an older business: create default tables and menu.
     await safe_ensure_business_setup(user.get("business_id"))
@@ -421,6 +439,15 @@ async def edit_user(
             detail="Business ID is missing.",
         )
 
+    if (
+        user_id == current_user["id"]
+        and user_data.role.value != current_user["role"]
+    ):
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="You cannot change your own role.",
+        )
+
     try:
         updated_user = await update_user(
             user_id=user_id,
@@ -463,6 +490,12 @@ async def update_user_status(
             detail="Business ID is missing.",
         )
 
+    if user_id == current_user["id"] and not status_data.is_active:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="You cannot deactivate your own account.",
+        )
+
     updated_user = await set_user_status(
         user_id=user_id,
         is_active=status_data.is_active,
@@ -498,11 +531,17 @@ async def update_user_pin(
             detail="Business ID is missing.",
         )
 
-    updated_user = await set_user_pin(
-        user_id=user_id,
-        pin=pin_data.pin,
-        business_id=business_id,
-    )
+    try:
+        updated_user = await set_user_pin(
+            user_id=user_id,
+            pin=pin_data.pin,
+            business_id=business_id,
+        )
+    except ValueError as error:
+        raise HTTPException(
+            status_code=status.HTTP_409_CONFLICT,
+            detail=str(error),
+        ) from error
 
     if updated_user is None:
         raise HTTPException(

@@ -4,6 +4,8 @@ from typing import Annotated
 from bson import ObjectId
 from fastapi import APIRouter, Depends, HTTPException, status
 
+from app.core.config import demo_tools_enabled
+from app.core.rate_limit import login_limiter
 from app.core.security import verify_password
 from app.core.subscription_access import (
     require_pro_plan,
@@ -211,10 +213,11 @@ async def prepare_order_items(
     return prepared_items, total_items, round(order_total, 2)
 
 
-async def ensure_stock_available(
-    items: list[dict],
-    business_id: ObjectId,
-) -> None:
+def merge_item_quantities(items: list[dict]) -> dict[str, int]:
+    """Add up quantities per product, so the same product listed twice
+    is checked against the stock as one total."""
+    totals: dict[str, int] = {}
+
     for item in items:
         product_id = item.get("product_id")
 
@@ -224,11 +227,54 @@ async def ensure_stock_available(
                 detail="Order contains an invalid product ID.",
             )
 
-        product = await database["products"].find_one(
+        quantity = int(item.get("quantity", 0))
+
+        if quantity <= 0:
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail="Order contains an invalid quantity.",
+            )
+
+        totals[product_id] = totals.get(product_id, 0) + quantity
+
+    return totals
+
+
+async def reserve_stock(
+    items: list[dict],
+    business_id: ObjectId,
+) -> None:
+    """Take the stock for all items, or for none of them.
+
+    Each product is decremented with one atomic MongoDB update that only
+    succeeds while enough stock is left, so two waiters ordering the last
+    item at the same moment can no longer both get it. If a product
+    fails, the products already taken are put back.
+    """
+    taken: list[tuple[str, int]] = []
+
+    for product_id, quantity in merge_item_quantities(items).items():
+        result = await database["products"].update_one(
             {
                 "_id": ObjectId(product_id),
                 "business_id": business_id,
-            }
+                "stock": {"$gte": quantity},
+            },
+            {"$inc": {"stock": -quantity}},
+        )
+
+        if result.modified_count == 1:
+            taken.append((product_id, quantity))
+            continue
+
+        for taken_id, taken_quantity in taken:
+            await database["products"].update_one(
+                {"_id": ObjectId(taken_id), "business_id": business_id},
+                {"$inc": {"stock": taken_quantity}},
+            )
+
+        product = await database["products"].find_one(
+            {"_id": ObjectId(product_id), "business_id": business_id}
         )
 
         if not product:
@@ -237,23 +283,14 @@ async def ensure_stock_available(
                 detail=f"Product not found: {product_id}",
             )
 
-        available = int(product.get("stock", 0))
-        requested = int(item.get("quantity", 0))
-
-        if requested <= 0:
-            raise HTTPException(
-                status_code=status.HTTP_400_BAD_REQUEST,
-                detail="Order contains an invalid quantity.",
-            )
-
-        if available < requested:
-            raise HTTPException(
-                status_code=status.HTTP_409_CONFLICT,
-                detail=(
-                    f"Not enough stock for {product.get('name', 'product')}. "
-                    f"Available: {available}, requested: {requested}."
-                ),
-            )
+        raise HTTPException(
+            status_code=status.HTTP_409_CONFLICT,
+            detail=(
+                f"Not enough stock for {product.get('name', 'product')}. "
+                f"Available: {int(product.get('stock', 0))}, "
+                f"requested: {quantity}."
+            ),
+        )
 
 
 async def change_stock(
@@ -285,19 +322,18 @@ async def deduct_stock_if_needed(
     order: dict,
     business_id: ObjectId,
 ) -> dict:
-    if order.get("stock_deducted") and not order.get("stock_restored"):
-        return order
-
-    items = order.get("items", [])
-    await ensure_stock_available(items, business_id)
-    await change_stock(items, business_id, -1)
-
     now = datetime.now(timezone.utc)
 
-    await database["orders"].update_one(
+    # Mark the order as "stock taken" first. Only one request can win
+    # this update, so pressing "Pay" twice never takes the stock twice.
+    claim = await database["orders"].update_one(
         {
             "_id": order["_id"],
             "business_id": business_id,
+            "$or": [
+                {"stock_deducted": {"$ne": True}},
+                {"stock_restored": True},
+            ],
         },
         {
             "$set": {
@@ -309,6 +345,22 @@ async def deduct_stock_if_needed(
             }
         },
     )
+
+    if claim.modified_count == 1:
+        try:
+            await reserve_stock(order.get("items", []), business_id)
+        except Exception:
+            await database["orders"].update_one(
+                {"_id": order["_id"], "business_id": business_id},
+                {
+                    "$set": {
+                        "stock_deducted": order.get("stock_deducted", False),
+                        "stock_restored": order.get("stock_restored", False),
+                        "stock_deducted_at": order.get("stock_deducted_at"),
+                    }
+                },
+            )
+            raise
 
     return await database["orders"].find_one(
         {"_id": order["_id"], "business_id": business_id}
@@ -431,6 +483,11 @@ async def verify_tenant_admin_pin(
     business_id: ObjectId,
     pin: str,
 ) -> dict:
+    # Any waiter can call this endpoint, so without a limit they could
+    # try all 10,000 admin PINs.
+    limiter_key = f"admin-pin:{business_id}"
+    login_limiter.check(limiter_key)
+
     cursor = database["users"].find(
         {
             "business_id": business_id,
@@ -442,7 +499,10 @@ async def verify_tenant_admin_pin(
 
     async for admin in cursor:
         if verify_password(pin, admin["hashed_pin"]):
+            login_limiter.reset(limiter_key)
             return admin
+
+    login_limiter.record_failure(limiter_key)
 
     raise HTTPException(
         status_code=status.HTTP_403_FORBIDDEN,
@@ -622,6 +682,14 @@ async def get_bar_orders(
 async def reset_demo_orders(
     current_user: Annotated[dict, Depends(get_current_user)],
 ):
+    # Deleting every order also deletes the sales history (Z reports are
+    # built from it), so this only exists for local demos.
+    if not demo_tools_enabled():
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="Demo reset is disabled.",
+        )
+
     if current_user.get("role") != "admin":
         raise HTTPException(
             status_code=status.HTTP_403_FORBIDDEN,
@@ -876,8 +944,7 @@ async def add_items_to_order(
         business_id,
     )
 
-    await ensure_stock_available(prepared, business_id)
-    await change_stock(prepared, business_id, -1)
+    await reserve_stock(prepared, business_id)
 
     now = datetime.now(timezone.utc)
 
@@ -888,9 +955,6 @@ async def add_items_to_order(
         item["added_at"] = now
 
     update_fields = {
-        "items": [*order.get("items", []), *prepared],
-        "total_items": int(order.get("total_items", 0)) + added_count,
-        "total": round(float(order.get("total", 0)) + added_total, 2),
         "status": "sent_to_kitchen",
         "ready_at": None,
         "stock_deducted": True,
@@ -904,14 +968,35 @@ async def add_items_to_order(
     if any(item.get("category") in BAR_CATEGORIES for item in prepared):
         update_fields["bar_status"] = "pending"
 
-    await database["orders"].update_one(
-        {"_id": order["_id"], "business_id": business_id},
-        {"$set": update_fields},
+    # $push / $inc instead of rewriting the whole list: if two waiters add
+    # items at the same moment, both additions are kept.
+    result = await database["orders"].update_one(
+        {
+            "_id": order["_id"],
+            "business_id": business_id,
+            "status": {"$nin": ["draft", "paid", "cancelled"]},
+        },
+        {
+            "$push": {"items": {"$each": prepared}},
+            "$inc": {
+                "total_items": added_count,
+                "total": added_total,
+            },
+            "$set": update_fields,
+        },
     )
+
+    if result.modified_count == 0:
+        await change_stock(prepared, business_id, 1)
+        raise HTTPException(
+            status_code=status.HTTP_409_CONFLICT,
+            detail="The order was closed while adding items.",
+        )
 
     updated = await database["orders"].find_one(
         {"_id": order["_id"], "business_id": business_id}
     )
+
     return serialize_order(updated)
 
 
@@ -993,6 +1078,7 @@ async def update_order_status(
     updated = await database["orders"].find_one(
         {"_id": order["_id"], "business_id": business_id}
     )
+
     return serialize_order(updated)
 
 
@@ -1020,8 +1106,12 @@ async def pay_order(
     order = await deduct_stock_if_needed(order, business_id)
     now = datetime.now(timezone.utc)
 
-    await database["orders"].update_one(
-        {"_id": order["_id"], "business_id": business_id},
+    result = await database["orders"].update_one(
+        {
+            "_id": order["_id"],
+            "business_id": business_id,
+            "status": {"$in": list(PAYABLE_ORDER_STATUSES)},
+        },
         {
             "$set": {
                 "status": "paid",
@@ -1034,6 +1124,12 @@ async def pay_order(
             }
         },
     )
+
+    if result.modified_count == 0:
+        raise HTTPException(
+            status_code=status.HTTP_409_CONFLICT,
+            detail="This order was already paid or cancelled.",
+        )
 
     await free_order_table(order, business_id)
 
@@ -1071,8 +1167,12 @@ async def release_order_complimentary(
     original_total = round(float(order.get("total", 0)), 2)
     now = datetime.now(timezone.utc)
 
-    await database["orders"].update_one(
-        {"_id": order["_id"], "business_id": business_id},
+    result = await database["orders"].update_one(
+        {
+            "_id": order["_id"],
+            "business_id": business_id,
+            "status": {"$in": list(PAYABLE_ORDER_STATUSES)},
+        },
         {
             "$set": {
                 "status": "paid",
@@ -1089,6 +1189,12 @@ async def release_order_complimentary(
             }
         },
     )
+
+    if result.modified_count == 0:
+        raise HTTPException(
+            status_code=status.HTTP_409_CONFLICT,
+            detail="This order was already paid or cancelled.",
+        )
 
     await database["audit_logs"].insert_one(
         {
@@ -1129,11 +1235,15 @@ async def cancel_order(
             detail="Only draft or sent orders can be cancelled.",
         )
 
-    await restore_stock_if_needed(order, business_id)
     now = datetime.now(timezone.utc)
 
-    await database["orders"].update_one(
-        {"_id": order["_id"], "business_id": business_id},
+    # Cancel first (only one request can win), then give the stock back.
+    result = await database["orders"].update_one(
+        {
+            "_id": order["_id"],
+            "business_id": business_id,
+            "status": {"$in": list(CANCELLABLE_ORDER_STATUSES)},
+        },
         {
             "$set": {
                 "status": "cancelled",
@@ -1145,6 +1255,14 @@ async def cancel_order(
             }
         },
     )
+
+    if result.modified_count == 0:
+        raise HTTPException(
+            status_code=status.HTTP_409_CONFLICT,
+            detail="This order was already paid or cancelled.",
+        )
+
+    await restore_stock_if_needed(order, business_id)
 
     await free_order_table(order, business_id)
 

@@ -26,6 +26,7 @@ services:
       MONGODB_URL: mongodb://mongo:27017
       MONGODB_DB_NAME: tavora
       JWT_SECRET_KEY: ${JWT_SECRET_KEY:-local-dev-secret-change-me}
+      ALLOW_DEMO_TOOLS: ${ALLOW_DEMO_TOOLS:-false}
     ports:
       - "8000:8000"
     healthcheck:

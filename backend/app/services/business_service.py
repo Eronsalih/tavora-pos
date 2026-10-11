@@ -1,8 +1,12 @@
-from datetime import datetime, timedelta, timezone
+from datetime import datetime, timezone
 from typing import Any
 
 from bson import ObjectId
 
+from app.core.subscription_dates import (
+    compute_new_expiry,
+    is_continuing_subscription,
+)
 from app.database.mongodb import database
 from app.schemas.business import BusinessSignup
 from app.services.business_setup import safe_ensure_business_setup
@@ -101,6 +105,7 @@ async def activate_business_subscription(
     payment_provider: str,
     expires_at: datetime,
     billing_cycle: str = "manual",
+    started_at: datetime | None = None,
 ) -> dict[str, Any] | None:
     if not ObjectId.is_valid(business_id):
         return None
@@ -113,7 +118,7 @@ async def activate_business_subscription(
             "$set": {
                 "subscription_plan": plan,
                 "subscription_status": "active",
-                "subscription_started_at": now,
+                "subscription_started_at": started_at or now,
                 "subscription_expires_at": expires_at,
                 "subscription_billing_cycle": billing_cycle,
                 "payment_provider": payment_provider,
@@ -143,14 +148,15 @@ async def activate_business_for_days(
 
     current_expiry = current.get("subscription_expires_at")
 
-    if current_expiry and current_expiry.tzinfo is None:
-        current_expiry = current_expiry.replace(tzinfo=timezone.utc)
-
-    starts_from = (
-        current_expiry
-        if current.get("subscription_status") == "active"
-        and current_expiry
-        and current_expiry > now
+    # Extending a running subscription keeps its original start date;
+    # a new or expired one starts today.
+    started_at = (
+        current.get("subscription_started_at")
+        if is_continuing_subscription(
+            current.get("subscription_status"),
+            current_expiry,
+            now,
+        )
         else now
     )
 
@@ -158,8 +164,9 @@ async def activate_business_for_days(
         business_id=business_id,
         plan=plan,
         payment_provider=payment_provider,
-        expires_at=starts_from + timedelta(days=duration_days),
-    billing_cycle=billing_cycle,
+        expires_at=compute_new_expiry(current_expiry, duration_days, now),
+        billing_cycle=billing_cycle,
+        started_at=started_at,
     )
 
 

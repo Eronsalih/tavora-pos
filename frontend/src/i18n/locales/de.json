@@ -181,6 +181,18 @@
     "VIP": "VIP"
   },
   "orderPanel": {
+    "saveOrderFirst": "Speichere zuerst die Bestellung.",
+    "transfer": {
+      "button": "Tisch wechseln",
+      "eyebrow": "Tisch {{number}}",
+      "title": "Neuen Tisch wählen",
+      "description": "Die Bestellung wird mit allen Artikeln auf den gewählten Tisch verschoben. Der aktuelle Tisch wird frei.",
+      "loading": "Freie Tische werden geladen...",
+      "noFreeTables": "Im Moment gibt es keine freien Tische.",
+      "success": "Bestellung auf Tisch {{number}} verschoben.",
+      "error": "Die Bestellung konnte nicht verschoben werden.",
+      "loadError": "Tische konnten nicht geladen werden."
+    },
     "outOfStock": "{{product}} ist nicht auf Lager.",
     "onlyLeft": "Nur noch {{count}}",
     "stockLabel": "Bestand: {{count}}",
@@ -329,6 +341,7 @@
     "logout": "Abmelden"
   },
   "complimentary": {
+    "proOnly": "Diese Funktion ist im Pro-Plan verfügbar.",
     "releaseButton": "Von Zahlung befreien",
     "eyebrow": "Administrator-Autorisierung",
     "title": "Bestellung von Zahlung befreien",

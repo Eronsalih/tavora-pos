@@ -31,3 +31,5 @@ frontend/release/
 
 # Local test/reset scripts
 backend/scripts/reset_business_a_password.py
+
+.env

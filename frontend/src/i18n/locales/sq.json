@@ -181,6 +181,18 @@
     "VIP": "VIP"
   },
   "orderPanel": {
+    "saveOrderFirst": "Ruaje porosinë së pari.",
+    "transfer": {
+      "button": "Ndrysho tavolinën",
+      "eyebrow": "Tavolina {{number}}",
+      "title": "Zgjidh tavolinën e re",
+      "description": "Porosia kalon me të gjitha artikujt në tavolinën e zgjedhur. Tavolina aktuale lirohet.",
+      "loading": "Duke ngarkuar tavolinat e lira...",
+      "noFreeTables": "Nuk ka tavolina të lira tani.",
+      "success": "Porosia u kalua në tavolinën {{number}}.",
+      "error": "Porosia nuk mund të kalohet.",
+      "loadError": "Tavolinat nuk mund të ngarkohen."
+    },
     "outOfStock": "{{product}} është jashtë stokut.",
     "onlyLeft": "Vetëm {{count}} të mbetura",
     "stockLabel": "Stoku: {{count}}",
@@ -329,6 +341,7 @@
     "logout": "Dil"
   },
   "complimentary": {
+    "proOnly": "Kjo veçori është vetëm në planin Pro.",
     "releaseButton": "Liro nga pagesa",
     "eyebrow": "Autorizim administratori",
     "title": "Liro porosinë nga pagesa",

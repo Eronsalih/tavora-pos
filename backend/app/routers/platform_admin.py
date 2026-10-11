@@ -1,3 +1,4 @@
+import re
 from datetime import datetime, timezone
 from typing import Annotated
 
@@ -161,7 +162,8 @@ async def get_platform_businesses(
         query["subscription_status"] = subscription_status
 
     if search and search.strip():
-        value = search.strip()
+        # escape: characters like "(" or "*" are searched literally
+        value = re.escape(search.strip())
         query["$or"] = [
             {"name": {"$regex": value, "$options": "i"}},
             {"owner_name": {"$regex": value, "$options": "i"}},
@@ -279,6 +281,7 @@ async def update_business_enabled(
         {
             "type": "platform_business_enabled_changed",
             "business_id": ObjectId(business_id),
+            "business_name": business.get("name"),
             "enabled": enabled,
             "performed_by_user_id": current_user["id"],
             "performed_by_name": current_user["name"],
@@ -314,6 +317,7 @@ async def activate_business_manually(
         {
             "type": "platform_subscription_manual_activation",
             "business_id": ObjectId(business_id),
+            "business_name": business.get("name"),
             "plan": data.plan,
             "duration_days": data.duration_days,
             "note": data.note,
@@ -355,6 +359,7 @@ async def update_subscription_status(
         {
             "type": "platform_subscription_status_changed",
             "business_id": ObjectId(business_id),
+            "business_name": business.get("name"),
             "subscription_status": subscription_status,
             "performed_by_user_id": current_user["id"],
             "performed_by_name": current_user["name"],

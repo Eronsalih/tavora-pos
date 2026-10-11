@@ -8,6 +8,7 @@ from app.database.mongodb import database
 from app.routers.auth import (
     get_current_user,
     require_active_subscription,
+    require_admin,
 )
 from app.schemas.table import TableCreate, TableUpdate
 from app.services.table_seed import seed_tables
@@ -60,6 +61,31 @@ def serialize_table(table: dict) -> dict:
     }
 
 
+ACTIVE_ORDER_STATUSES = ["draft", "sent_to_kitchen", "preparing", "ready"]
+
+
+async def table_has_active_order(
+    table: dict,
+    business_id: ObjectId,
+) -> bool:
+    """A table must not be freed or deleted while an order is open on it,
+    otherwise that order (and its money) is lost from the floor plan."""
+    active_order_id = table.get("active_order_id")
+
+    if not active_order_id:
+        return False
+
+    order = await database["orders"].find_one(
+        {
+            "_id": active_order_id,
+            "business_id": business_id,
+            "status": {"$in": ACTIVE_ORDER_STATUSES},
+        }
+    )
+
+    return order is not None
+
+
 @router.post(
     "",
     status_code=status.HTTP_201_CREATED,
@@ -68,7 +94,7 @@ async def create_table(
     table: TableCreate,
     current_user: Annotated[
         dict,
-        Depends(get_current_user),
+        Depends(require_admin),
     ],
 ):
     business_id = get_business_object_id(
@@ -162,7 +188,7 @@ async def get_tables(
 async def seed_all_tables(
     current_user: Annotated[
         dict,
-        Depends(get_current_user),
+        Depends(require_admin),
     ],
 ):
     business_id = get_business_object_id(
@@ -219,7 +245,7 @@ async def update_table(
     table: TableUpdate,
     current_user: Annotated[
         dict,
-        Depends(get_current_user),
+        Depends(require_admin),
     ],
 ):
     business_id = get_business_object_id(
@@ -355,6 +381,15 @@ async def update_table_status(
             detail="Table not found",
         )
 
+    if await table_has_active_order(table, business_id):
+        raise HTTPException(
+            status_code=status.HTTP_409_CONFLICT,
+            detail=(
+                "This table has an open order. Pay or cancel the "
+                "order first."
+            ),
+        )
+
     update_operation = {
         "$set": {
             "status": table_status,
@@ -389,7 +424,7 @@ async def delete_table(
     table_id: str,
     current_user: Annotated[
         dict,
-        Depends(get_current_user),
+        Depends(require_admin),
     ],
 ):
     business_id = get_business_object_id(
@@ -400,6 +435,22 @@ async def delete_table(
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
             detail="Invalid table ID",
+        )
+
+    table = await database.tables.find_one(
+        {
+            "_id": ObjectId(table_id),
+            "business_id": business_id,
+        }
+    )
+
+    if table and await table_has_active_order(table, business_id):
+        raise HTTPException(
+            status_code=status.HTTP_409_CONFLICT,
+            detail=(
+                "This table has an open order. Pay or cancel the "
+                "order first."
+            ),
         )
 
     result = await database.tables.delete_one(

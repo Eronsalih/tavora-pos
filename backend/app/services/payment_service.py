@@ -1,4 +1,3 @@
-import os
 from datetime import datetime, timezone
 from typing import Any
 
@@ -264,8 +263,11 @@ async def complete_payment(
 
     now = datetime.now(timezone.utc)
 
-    await payments_collection.update_one(
-        {"_id": payment["_id"]},
+    # Paddle can send the same webhook twice, even at the same moment.
+    # Only the request that flips the payment to "paid" adds the days,
+    # so a café never gets a free second month.
+    claim = await payments_collection.update_one(
+        {"_id": payment["_id"], "status": {"$ne": "paid"}},
         {
             "$set": {
                 "status": "paid",
@@ -278,6 +280,10 @@ async def complete_payment(
             }
         },
     )
+
+    if claim.modified_count == 0:
+        payment = await payments_collection.find_one({"_id": payment["_id"]})
+        return serialize_payment(payment)
 
     await activate_business_for_days(
         business_id=str(payment["business_id"]),

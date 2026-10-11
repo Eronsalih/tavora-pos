@@ -912,3 +912,128 @@
   cursor: not-allowed;
   opacity: 0.5;
 }
+
+/* Header buttons: "Change table" and "Release from payment" */
+.order-panel-header-actions {
+  flex-wrap: wrap;
+  justify-content: flex-end;
+}
+
+.order-header-button {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  padding: 9px 14px;
+  border: 1px solid #d9dce8;
+  border-radius: 10px;
+  background: #ffffff;
+  color: #343747;
+  font-size: 13px;
+  font-weight: 800;
+  cursor: pointer;
+  white-space: nowrap;
+}
+
+.order-header-button:hover:not(:disabled) {
+  border-color: #c9c3ff;
+  background: #f4f2ff;
+  color: #5b4cdd;
+}
+
+.order-header-button-gift:hover:not(:disabled) {
+  border-color: #f5c9a8;
+  background: #fff7f0;
+  color: #b45309;
+}
+
+.order-header-button:disabled {
+  cursor: not-allowed;
+  opacity: 0.55;
+}
+
+.order-header-badge {
+  padding: 2px 6px;
+  border-radius: 6px;
+  background: #ede9ff;
+  color: #5b4cdd;
+  font-size: 10px;
+  letter-spacing: 0.5px;
+}
+
+/* Change table modal */
+.transfer-modal {
+  width: min(100%, 520px);
+}
+
+.transfer-table-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(88px, 1fr));
+  gap: 10px;
+  max-height: 340px;
+  margin-top: 16px;
+  overflow-y: auto;
+}
+
+.transfer-table-option {
+  display: flex;
+  min-height: 74px;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  border: 1px solid #d7f0e0;
+  border-radius: 12px;
+  background: #f3fbf6;
+  color: #172033;
+  cursor: pointer;
+}
+
+.transfer-table-option strong {
+  font-size: 22px;
+}
+
+.transfer-table-option small {
+  color: #6b7280;
+  font-size: 12px;
+}
+
+.transfer-table-option:hover:not(:disabled) {
+  border-color: #22a35a;
+  background: #e6f7ec;
+}
+
+.transfer-table-option:disabled {
+  cursor: not-allowed;
+  opacity: 0.6;
+}
+
+.transfer-empty {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 18px 0 4px;
+  color: #6b7280;
+  font-weight: 600;
+}
+
+.transfer-spinner {
+  animation: transfer-spin 0.9s linear infinite;
+}
+
+@keyframes transfer-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@media (max-width: 640px) {
+  .order-panel-header {
+    align-items: flex-start;
+    gap: 12px;
+  }
+
+  .order-header-button {
+    padding: 8px 10px;
+    font-size: 12px;
+  }
+}

@@ -8,6 +8,7 @@ from app.database.mongodb import database
 from app.routers.auth import (
     get_current_user,
     require_active_subscription,
+    require_admin,
 )
 from app.schemas.product import (
     ProductCreate,
@@ -198,7 +199,7 @@ async def create_product(
     product_data: ProductCreate,
     current_user: Annotated[
         dict,
-        Depends(get_current_user),
+        Depends(require_admin),
     ],
 ):
     business_id = get_business_object_id(
@@ -250,7 +251,7 @@ async def update_product(
     product_data: ProductUpdate,
     current_user: Annotated[
         dict,
-        Depends(get_current_user),
+        Depends(require_admin),
     ],
 ):
     business_id = get_business_object_id(
@@ -325,7 +326,7 @@ async def delete_product(
     product_id: str,
     current_user: Annotated[
         dict,
-        Depends(get_current_user),
+        Depends(require_admin),
     ],
 ):
     business_id = get_business_object_id(
@@ -398,7 +399,7 @@ async def change_product_status(
     product_id: str,
     current_user: Annotated[
         dict,
-        Depends(get_current_user),
+        Depends(require_admin),
     ],
 ):
     business_id = get_business_object_id(
@@ -465,7 +466,7 @@ async def change_product_status(
 async def seed_products(
     current_user: Annotated[
         dict,
-        Depends(get_current_user),
+        Depends(require_admin),
     ],
 ):
     business_id = get_business_object_id(

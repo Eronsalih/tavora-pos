@@ -1,13 +1,12 @@
 import hashlib
 import hmac
 import json
-import os
 import time
 from typing import Annotated
 
 from fastapi import APIRouter, Depends, HTTPException, Request, status
 
-from app.core.config import settings
+from app.core.config import demo_tools_enabled, settings
 from app.core.subscription_plans import public_subscription_plans
 from app.routers.auth import get_current_user
 from app.schemas.payment import PaymentCreate, PaymentResponse
@@ -104,10 +103,19 @@ async def simulate_payment_success(
     payment_id: str,
     current_user: Annotated[dict, Depends(get_current_user)],
 ) -> PaymentResponse:
-    if os.getenv("APP_ENV", "development").lower() == "production":
+    # Without this guard any café admin could "pay" for a subscription
+    # without paying. Only enabled with ALLOW_DEMO_TOOLS=true outside
+    # production.
+    if not demo_tools_enabled():
         raise HTTPException(
             status_code=status.HTTP_403_FORBIDDEN,
-            detail="Payment simulation is disabled in production.",
+            detail="Payment simulation is disabled.",
+        )
+
+    if current_user.get("role") != "admin":
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="Administrator access is required.",
         )
 
     payment = await get_payment_by_id(
