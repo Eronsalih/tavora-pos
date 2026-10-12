@@ -253,6 +253,9 @@ export default function PlatformAdmin() {
                       <span className={`platform-admin-status status-${business.subscription_status}`}>
                         {business.subscription_plan} · {business.subscription_status}
                       </span>
+                      {business.payment_provider === "trial" && (
+                        <span className="platform-admin-trial">{t("platformAdmin.trial")}</span>
+                      )}
                       {business.latest_payment && <small>{t("platformAdmin.lastPayment")}: {business.latest_payment.status}</small>}
                     </td>
                     <td>{formatDate(business.subscription_expires_at, i18n.language)}</td>

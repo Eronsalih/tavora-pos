@@ -5,6 +5,7 @@ from datetime import datetime, timedelta, timezone
 from app.core.subscription_dates import (
     compute_new_expiry,
     is_continuing_subscription,
+    trial_subscription_fields,
 )
 
 NOW = datetime(2026, 10, 12, 12, 0, tzinfo=timezone.utc)
@@ -49,3 +50,27 @@ def test_only_running_active_subscription_keeps_start_date():
     assert not is_continuing_subscription("inactive", future, NOW)
     assert not is_continuing_subscription("active", past, NOW)
     assert not is_continuing_subscription("active", None, NOW)
+
+
+def test_new_cafe_gets_14_days_of_pro():
+    fields = trial_subscription_fields(NOW, 14)
+
+    assert fields["subscription_plan"] == "pro"
+    assert fields["subscription_status"] == "active"
+    assert fields["payment_provider"] == "trial"
+    assert fields["subscription_expires_at"] == NOW + timedelta(days=14)
+
+
+def test_trial_can_be_turned_off():
+    fields = trial_subscription_fields(NOW, 0)
+
+    assert fields["subscription_status"] == "inactive"
+    assert fields["subscription_expires_at"] is None
+
+
+def test_paying_during_trial_keeps_the_remaining_trial_days():
+    # 5 trial days left, then the café buys 1 month: nothing is lost.
+    trial_end = NOW + timedelta(days=5)
+
+    assert is_continuing_subscription("active", trial_end, NOW)
+    assert compute_new_expiry(trial_end, 30, NOW) == NOW + timedelta(days=35)

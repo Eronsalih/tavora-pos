@@ -52,3 +52,4 @@
 button:disabled { cursor: not-allowed; opacity: .65; }
 @media (max-width: 1050px) { .platform-admin-stats { grid-template-columns: repeat(2,minmax(0,1fr)); } .platform-admin-grid-two { grid-template-columns: 1fr; } }
 @media (max-width: 700px) { .platform-admin-page { padding: 16px; } .platform-admin-header, .platform-admin-panel-heading { align-items: stretch; flex-direction: column; } .platform-admin-header-actions { flex-wrap: wrap; } .platform-admin-search { min-width: 0; } .platform-admin-stats { grid-template-columns: 1fr; } }
+.platform-admin-trial { display: inline-block; margin-left: 6px; padding: 3px 8px; border-radius: 999px; background: #f4f2ff; color: #5b4cdd; font-size: 11px; font-weight: 800; }

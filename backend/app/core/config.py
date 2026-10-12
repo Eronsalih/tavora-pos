@@ -14,6 +14,9 @@ class Settings(BaseSettings):
     # set ALLOW_DEMO_TOOLS=true only on your own dev machine.
     allow_demo_tools: bool = False
 
+    # Free trial for new cafés (full Pro features). 0 turns it off.
+    trial_days: int = 14
+
     # Paddle
     paddle_environment: str = "sandbox"
     paddle_api_key: str | None = None

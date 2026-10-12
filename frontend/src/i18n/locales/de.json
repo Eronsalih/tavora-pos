@@ -432,7 +432,15 @@
     "xReport": "X-Bericht – aktueller Stand",
     "zReport": "Z-Bericht – Tagesabschluss"
   },
+  "trial": {
+    "daysLeft_one": "Kostenlose Testphase: noch {{count}} Tag.",
+    "daysLeft_other": "Kostenlose Testphase: noch {{count}} Tage.",
+    "lastDay": "Heute ist der letzte Tag deiner Testphase.",
+    "description": "Du hast alle Pro-Funktionen. Wähle einen Plan, damit deine Arbeit nicht unterbrochen wird.",
+    "choosePlan": "Plan wählen"
+  },
   "platformAdmin": {
+    "trial": "Test",
     "eyebrow": "Tavora Owner System",
     "title": "Platform Admin",
     "description": "Betriebe, Abonnements, Zahlungen und Audit-Protokolle der Plattform verwalten.",

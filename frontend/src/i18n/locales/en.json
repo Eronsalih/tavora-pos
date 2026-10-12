@@ -640,7 +640,15 @@
     "xReport": "X Report – current totals",
     "zReport": "Z Report – daily close"
   },
+  "trial": {
+    "daysLeft_one": "Free trial: {{count}} day left.",
+    "daysLeft_other": "Free trial: {{count}} days left.",
+    "lastDay": "Today is the last day of your free trial.",
+    "description": "You have every Pro feature. Choose a plan so your work is not interrupted.",
+    "choosePlan": "Choose a plan"
+  },
   "platformAdmin": {
+    "trial": "Trial",
     "eyebrow": "Tavora Owner System",
     "title": "Platform Admin",
     "description": "Manage businesses, subscriptions, payments and platform audit records.",

@@ -432,7 +432,15 @@
     "xReport": "X Report – gjendja aktuale",
     "zReport": "Z Report – mbyllja ditore"
   },
+  "trial": {
+    "daysLeft_one": "Prova falas: të ka mbetur {{count}} ditë.",
+    "daysLeft_other": "Prova falas: të kanë mbetur {{count}} ditë.",
+    "lastDay": "Sot është dita e fundit e provës falas.",
+    "description": "I ke të gjitha veçoritë Pro. Zgjidh një plan që të mos ndërpritet puna.",
+    "choosePlan": "Zgjidh planin"
+  },
   "platformAdmin": {
+    "trial": "Provë",
     "eyebrow": "Tavora Owner System",
     "title": "Platform Admin",
     "description": "Menaxho bizneset, abonimet, pagesat dhe auditimin e platformës.",

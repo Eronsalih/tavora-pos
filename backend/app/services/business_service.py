@@ -3,9 +3,11 @@ from typing import Any
 
 from bson import ObjectId
 
+from app.core.config import settings
 from app.core.subscription_dates import (
     compute_new_expiry,
     is_continuing_subscription,
+    trial_subscription_fields,
 )
 from app.database.mongodb import database
 from app.schemas.business import BusinessSignup
@@ -58,11 +60,7 @@ async def create_business_account(
         "phone": signup_data.phone.strip() if signup_data.phone else None,
         "country": signup_data.country.strip() if signup_data.country else None,
         "is_active": True,
-        "subscription_plan": "none",
-        "subscription_status": "inactive",
-        "subscription_started_at": None,
-        "subscription_expires_at": None,
-        "payment_provider": None,
+        **trial_subscription_fields(now, settings.trial_days),
         "created_at": now,
         "updated_at": now,
     }

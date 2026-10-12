@@ -36,6 +36,32 @@ def compute_new_expiry(
     return starts_from + timedelta(days=duration_days)
 
 
+def trial_subscription_fields(now: datetime, trial_days: int) -> dict:
+    """Subscription fields for a brand-new café.
+
+    With a trial, the café gets every Pro feature for `trial_days` days and
+    can start working right away. Without one it starts inactive and has
+    to pay first.
+    """
+    if trial_days <= 0:
+        return {
+            "subscription_plan": "none",
+            "subscription_status": "inactive",
+            "subscription_started_at": None,
+            "subscription_expires_at": None,
+            "payment_provider": None,
+        }
+
+    return {
+        "subscription_plan": "pro",
+        "subscription_status": "active",
+        "subscription_started_at": now,
+        "subscription_expires_at": now + timedelta(days=trial_days),
+        "subscription_billing_cycle": "trial",
+        "payment_provider": "trial",
+    }
+
+
 def is_continuing_subscription(
     current_status: str | None,
     current_expiry: datetime | None,
