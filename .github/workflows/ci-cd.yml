@@ -42,7 +42,7 @@ jobs:
           username: ${{ github.repository_owner }}
           password: ${{ secrets.GITHUB_TOKEN }}
 
-      # One step: builds both services and pushes both tags (SHA + latest)
+      # One step: builds both services and pushes both images (tagged with the commit SHA)
       - name: Build and push images
         env:
           IMAGE_TAG: ${{ github.sha }}
@@ -74,14 +74,15 @@ jobs:
           script: |
             mkdir -p ~/tavora-pos
 
-      - name: Copy Docker Compose file to VM
+      # Caddyfile is copied too: the compose file mounts it into the Caddy container.
+      - name: Copy Docker Compose file and Caddyfile to VM
         uses: appleboy/scp-action@v1
         with:
           host: ${{ secrets.SSH_HOST }}
           username: ${{ secrets.SSH_USERNAME }}
           key: ${{ secrets.SSH_KEY }}
           port: 22
-          source: "docker-compose.prod.yml"
+          source: "docker-compose.prod.yml,Caddyfile"
           target: "tavora-pos"
 
       - name: Pull and deploy on VM
@@ -97,10 +98,12 @@ jobs:
 
             # .env is written from GitHub secrets on every deploy,
             # so a brand-new VM needs no manual setup.
-            # Paddle secrets that don't exist yet are simply empty.
+            # Secrets that don't exist yet (DOMAIN, Paddle) are simply empty,
+            # and the compose file falls back to its defaults (DOMAIN -> :80, Paddle -> sandbox).
             umask 077
             cat > .env <<ENVFILE
             IMAGE_TAG=${{ github.sha }}
+            DOMAIN=${{ secrets.DOMAIN }}
             JWT_SECRET_KEY=${{ secrets.JWT_SECRET_KEY }}
             CORS_ORIGINS=${{ secrets.CORS_ORIGINS }}
             PADDLE_ENVIRONMENT=${{ secrets.PADDLE_ENVIRONMENT }}
@@ -121,13 +124,15 @@ jobs:
 
             docker compose -f docker-compose.prod.yml pull
 
-            docker compose -f docker-compose.prod.yml up -d --remove-orphans
+            # --wait blocks until every container is running and its healthcheck passes.
+            # If something is unhealthy, print status + logs and fail the pipeline.
+            docker compose -f docker-compose.prod.yml up -d --remove-orphans --wait --wait-timeout 120 || {
+              docker compose -f docker-compose.prod.yml ps
+              docker compose -f docker-compose.prod.yml logs --tail=50
+              exit 1
+            }
 
             # Remove unused images older than 7 days (keeps recent ones for rollback)
             docker image prune -af --filter "until=168h"
 
             docker compose -f docker-compose.prod.yml ps
-
-            # Fail the pipeline if the app is not healthy after deploy
-            sleep 20
-            curl -fsS http://localhost/api/health

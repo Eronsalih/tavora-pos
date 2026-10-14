@@ -1,6 +1,30 @@
 name: tavora-pos
 
+# Production stack for the DigitalOcean droplet.
+# Only Caddy publishes ports (80/443). Mongo, backend and frontend are
+# reachable only inside the Docker network.
+#
+# Replace YOUR_GITHUB_USERNAME (lowercase!) with your GitHub username.
+
 services:
+  caddy:
+    image: caddy:2
+    container_name: tavora-caddy
+    restart: unless-stopped
+    ports:
+      - "80:80"
+      - "443:443"
+    environment:
+      # ":80"          -> plain HTTP on the server IP (first deploy, no domain yet)
+      # "tavora-pos.com" -> automatic HTTPS certificate
+      DOMAIN: ${DOMAIN:-:80}
+    volumes:
+      - ./Caddyfile:/etc/caddy/Caddyfile:ro
+      - caddy_data:/data
+      - caddy_config:/config
+    depends_on:
+      - frontend
+
   mongo:
     image: mongo:7
     container_name: tavora-mongo
@@ -16,11 +40,7 @@ services:
   backend:
     build:
       context: ./backend
-      # Extra tag: every build is also tagged "latest"
-      tags:
-        - ghcr.io/eronsalih/tavora-pos-backend:latest
-    # IMAGE_TAG = commit SHA (set by CI/CD). Falls back to "latest".
-    image: ghcr.io/eronsalih/tavora-pos-backend:${IMAGE_TAG:-latest}
+    image: ghcr.io/eronsalih/tavora-backend:${IMAGE_TAG:?IMAGE_TAG is required}
     container_name: tavora-backend
     restart: unless-stopped
     depends_on:
@@ -30,10 +50,9 @@ services:
       APP_ENV: production
       MONGODB_URL: mongodb://mongo:27017
       MONGODB_DB_NAME: tavora
-      JWT_SECRET_KEY: ${JWT_SECRET_KEY:?JWT_SECRET_KEY must be set in .env}
-      JWT_ALGORITHM: HS256
-      ACCESS_TOKEN_EXPIRE_MINUTES: ${ACCESS_TOKEN_EXPIRE_MINUTES:-480}
+      JWT_SECRET_KEY: ${JWT_SECRET_KEY:?JWT_SECRET_KEY is required}
       CORS_ORIGINS: ${CORS_ORIGINS:-}
+      ALLOW_DEMO_TOOLS: "false"
       PADDLE_ENVIRONMENT: ${PADDLE_ENVIRONMENT:-sandbox}
       PADDLE_API_KEY: ${PADDLE_API_KEY:-}
       PADDLE_WEBHOOK_SECRET: ${PADDLE_WEBHOOK_SECRET:-}
@@ -53,16 +72,14 @@ services:
   frontend:
     build:
       context: ./frontend
-      tags:
-        - ghcr.io/eronsalih/tavora-pos-frontend:latest
-    image: ghcr.io/eronsalih/tavora-pos-frontend:${IMAGE_TAG:-latest}
+    image: ghcr.io/eronsalih/tavora-frontend:${IMAGE_TAG:?IMAGE_TAG is required}
     container_name: tavora-frontend
     restart: unless-stopped
     depends_on:
       backend:
         condition: service_healthy
-    ports:
-      - "80:80"
 
 volumes:
   mongo_data:
+  caddy_data:
+  caddy_config:
